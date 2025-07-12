@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <title>医薬品検索（パスワード付き）</title>
+  <style>
+    body { font-family: sans-serif; padding: 20px; }
+    ul { list-style: none; padding: 0; }
+    li { padding: 5px; cursor: pointer; }
+    li:hover { background-color: #f0f0f0; }
+    small { color: #555; }
+    #auth { text-align: center; margin-top: 100px; }
+    #main { display: none; }
+  </style>
+</head>
+<body>
+
+<div id="auth">
+  <h2>このページはパスワードで保護されています</h2>
+  <input type="password" id="password" placeholder="パスワードを入力" />
+  <button onclick="checkPassword()">認証</button>
+  <p id="error" style="color:red;"></p>
+</div>
+
+<div id="main">
+  <h2>先発医薬品名を入力：</h2>
+  <input type="text" id="input" placeholder="例：ノルバスク">
+  <ul id="suggestions"></ul>
+  <div id="results"></div>
+</div>
+
+<script>
+  // ✅ ここでパスワード設定（例：「1234」）
+  const correctPassword = "1234";
+
+  function checkPassword() {
+    const input = document.getElementById("password").value;
+    if (input === correctPassword) {
+      document.getElementById("auth").style.display = "none";
+      document.getElementById("main").style.display = "block";
+    } else {
+      document.getElementById("error").textContent = "パスワードが違います。";
+    }
+  }
+
+  // ↓ 通常の薬検索スクリプト
+  const data = [
+    { brand: "ノルバスク", brandShelf: "棚A1", generic: "アムロジピン「サワイ」", genericShelf: "棚B1" },
+    { brand: "リピトール", brandShelf: "棚A2", generic: "アトルバスタチン「トーワ」", genericShelf: "棚B5" }
+  ];
+
+  const input = document.getElementById('input');
+  const suggestions = document.getElementById('suggestions');
+  const results = document.getElementById('results');
+
+  input?.addEventListener('input', () => {
+    const query = input.value.trim();
+    if (!query) {
+      suggestions.innerHTML = '';
+      results.innerHTML = '';
+      return;
+    }
+
+    const brands = [...new Set(data.map(d => d.brand).filter(b => b.includes(query)))];
+    suggestions.innerHTML = '';
+    brands.forEach(brand => {
+      const li = document.createElement('li');
+      li.textContent = brand;
+      li.onclick = () => showGenerics(brand);
+      suggestions.appendChild(li);
+    });
+  });
+
+  function showGenerics(brand) {
+    input.value = brand;
+    suggestions.innerHTML = '';
+    const matches = data.filter(d => d.brand === brand);
+    const brandShelf = matches[0]?.brandShelf || "（不明）";
+    const generics = matches.map(d => {
+      return `<li>${d.generic}<br><small>→ 後発薬棚: ${d.genericShelf}</small></li>`;
+    });
+
+    results.innerHTML = `
+      <h3>後発医薬品一覧：</h3>
+      <ul>${generics.join('')}</ul>
+      <p><strong>【参考】先発薬（${brand}）の棚：</strong> ${brandShelf}</p>
+    `;
+  }
+</script>
+
+</body>
+</html>
