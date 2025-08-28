@@ -1,41 +1,9 @@
-<body>
-  <!-- 認証画面 -->
-  <div id="auth">
-    <h2>このページはパスワードで保護されています</h2>
-    <input type="password" id="password" placeholder="パスワードを入力" />
-    <button id="authBtn">認証</button>
-    <p id="error" style="color:red;"></p>
-  </div>
-
-  <!-- アプリ本体 -->
-  <div id="main" style="display:none;">
-    <!-- ここに薬品検索アプリのHTML（inputやリスト、ボタンなど全部） -->
-  </div>
-
-  <script>
-    // ✅ パスワード設定
-    const correctPassword = "1234"; // 任意に変更
-    function checkPassword() {
-      const input = document.getElementById("password").value;
-      if (input === correctPassword) {
-        document.getElementById("auth").style.display = "none";
-        document.getElementById("main").style.display = "block";
-      } else {
-        document.getElementById("error").textContent = "パスワードが違います。";
-      }
-    }
-    document.getElementById("authBtn").addEventListener("click", checkPassword);
-    document.getElementById("password").addEventListener("keydown", e => {
-      if(e.key==="Enter") checkPassword();
-    });
-  </script>
-  <!-- ↓この後に薬品検索アプリの既存JavaScriptを続けて書く -->
-
 <!DOCTYPE html>
 <html lang="ja">
 <head>
   <meta charset="UTF-8" />
-  <title>医薬品検索（選択・保存・出力付き）</title>
+  <title>医薬品検索（パスワード付き）</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
   <style>
     body { font-family: sans-serif; padding: 20px; }
     ul { list-style: none; padding: 0; }
@@ -48,34 +16,69 @@
     .box { border: 1px solid #ccc; padding: 12px; margin-bottom: 12px; border-radius: 6px; }
     button { margin-right: 10px; margin-top: 10px; }
     .hint { color: #666; font-size: 12px; margin-top: 4px; }
-    input[type="text"] { width: 100%; max-width: 520px; padding: 8px; }
+    input[type="text"], input[type="password"] { width: 100%; max-width: 520px; padding: 8px; }
+    /* 認証画面 */
+    #auth { text-align: center; margin-top: 24px; }
+    #main { display: none; }
   </style>
 </head>
 <body>
-  <h2>医薬品検索（最大20件まで選択可能）</h2>
-  <input type="text" id="input" placeholder="例：一般名 または 品名（ひらがな入力OK）" />
-  <div class="hint">例：どきさぞしん / あるふぁろーる / 「そくほうじょう」等もヒットします（ひらがな→カタカナ対応）</div>
-  <ul id="suggestions"></ul>
+  <!-- 認証画面 -->
+  <div id="auth">
+    <h2>このページはパスワードで保護されています</h2>
+    <input type="password" id="password" placeholder="パスワードを入力" />
+    <button id="authBtn">認証</button>
+    <p id="error" style="color:red;"></p>
+  </div>
 
-  <h3>氏名を入力してください：</h3>
-  <input type="text" id="personName" placeholder="氏名を入力"><br>
+  <!-- アプリ本体（ぜんぶこの中） -->
+  <div id="main">
+    <h2>医薬品検索（最大20件まで選択可能）</h2>
+    <input type="text" id="input" placeholder="例：一般名 または 品名（ひらがな入力OK）" />
+    <div class="hint">例：どきさぞしん / あるふぁろーる / 「そくほうじょう」等もヒットします（ひらがな→カタカナ対応）</div>
+    <ul id="suggestions"></ul>
 
-  <h3>選択された医薬品：</h3>
-  <div id="selected"></div>
-  <button id="saveBtn">保存</button>
-  <button id="csvBtn">CSV出力</button>
-  <button onclick="window.print()">印刷</button>
-  <!-- 追加: 全リセットして先頭へ戻る -->
-  <button id="resetBtn">TOPに戻る</button>
+    <h3>氏名を入力してください：</h3>
+    <input type="text" id="personName" placeholder="氏名を入力"><br>
 
-  <h3>保存されたデータ：</h3>
-  <div id="savedData"></div>
+    <h3>選択された医薬品：</h3>
+    <div id="selected"></div>
+    <button id="saveBtn">保存</button>
+    <button id="csvBtn">CSV出力</button>
+    <button onclick="window.print()">印刷</button>
+    <button id="resetBtn">TOPに戻る</button>
 
+    <h3>保存されたデータ：</h3>
+    <div id="savedData"></div>
+  </div>
+
+  <!-- 認証ロジック（DIVのあとに置く） -->
+  <script>
+    const correctPassword = "1234"; // ←任意で変更
+    const $auth = document.getElementById("auth");
+    const $main = document.getElementById("main");
+    const $pwd  = document.getElementById("password");
+    const $btn  = document.getElementById("authBtn");
+    const $err  = document.getElementById("error");
+
+    function unlock(){
+      $auth.style.display = "none";
+      $main.style.display = "block";
+      sessionStorage.setItem("authed","1");
+    }
+    function checkPassword(){
+      if ($pwd.value === correctPassword) unlock();
+      else $err.textContent = "パスワードが違います。";
+    }
+    $btn.addEventListener("click", checkPassword);
+    $pwd.addEventListener("keydown", e => { if (e.key === "Enter") checkPassword(); });
+    if (sessionStorage.getItem("authed")==="1") unlock();
+  </script>
+
+  <!-- アプリのJS -->
   <script>
     // ====== RAW：ここに “そのまま” 行データを貼る ======
     const RAW = `
-
-
 
 { "一般名称": "デュタステリド錠", "後発/ジェネリック": "デュタステリド錠０．５ｍｇＡＶ「ＤＳＥＰ」", "棚①": "D-4-3", "先発": "なし", "棚②": "ー" },
 { "一般名称": "クエチアピンフマル酸塩錠", "後発/ジェネリック": "クエチアピン錠１２．５ｍｇ「アメル」", "棚①": "D-4-2", "先発": "なし", "棚②": "ー" },
@@ -703,10 +706,9 @@
 
 
 
-
 `;
 
-    // ====== サニタイズ：CSV/Sheets崩れの自動修復 ======
+    // ====== サニタイズ ======
     function sanitize(raw) {
       let lines = raw.split(/\r?\n/).map(s => s.trim());
       lines = lines.filter(s => s && s !== ',' && s !== '，');
@@ -727,18 +729,12 @@
       });
       lines = lines.filter(Boolean);
       const jsonText = `[${lines.join(',')}]`;
-      try {
-        return JSON.parse(jsonText);
-      } catch (e) {
-        console.error('変換失敗:', e, jsonText);
-        alert('データ変換に失敗しました。F12→Consoleの赤文字の直前行を教えてください。');
-        return [];
-      }
+      try { return JSON.parse(jsonText); }
+      catch (e) { console.error('変換失敗:', e, jsonText); alert('データ変換に失敗'); return []; }
     }
-
     const simpleData = sanitize(RAW);
 
-    // ====== 正規化（general + variants配列） ======
+    // ====== 正規化 ======
     function normalizeFromSimple(arr){
       const emptyish = v => {
         const s = String(v ?? '').trim();
@@ -774,11 +770,9 @@
     let selectedList = [];
     let savedDataList = [];
 
-    // ====== 日本語正規化（NFKC + ひらがな→カタカナ） ======
+    // ====== 日本語正規化 ======
     function toKatakanaFromHiragana(str){
-      return str.replace(/[\u3041-\u3096]/g, ch =>
-        String.fromCharCode(ch.charCodeAt(0)+0x60)
-      );
+      return str.replace(/[\u3041-\u3096]/g, ch => String.fromCharCode(ch.charCodeAt(0)+0x60));
     }
     function normalizeJP(str){
       if (str == null) return "";
@@ -809,13 +803,7 @@
       });
       lines.push(`Note: ${escapeHtml(noteText)}`);
       li.innerHTML = `<small>${lines.join('<br>')}</small>`;
-
-      // 変更点：クリックで選択→候補クリア＆入力欄もクリア
-      li.onclick = () => {
-        selectItem(item);
-        suggestions.innerHTML = '';  // 候補を消す
-        input.value = '';            // 検索欄も空にする（残したい場合はこの行を消してください）
-      };
+      li.onclick = () => { selectItem(item); suggestions.innerHTML=''; input.value=''; };
       return li;
     }
 
@@ -830,7 +818,6 @@
         lines.push(`Note: ${escapeHtml(noteText)}`);
         const div = document.createElement('div');
         div.className = 'selected-item';
-        // ×で消せる
         div.innerHTML = `<small>${lines.join('<br>')}</small><span class="remove" onclick="removeItem(${i})">×</span>`;
         selectedContainer.appendChild(div);
       });
@@ -846,18 +833,14 @@
     function selectItem(item){
       if(selectedList.length >= 20){ alert("20件までしか選択できません。"); return; }
       if(selectedList.some(x => sameEntry(x, item))) return;
-      selectedList.push(item);
-      renderSelected();
+      selectedList.push(item); renderSelected();
     }
-    function removeItem(index){
-      selectedList.splice(index, 1);
-      renderSelected();
-    }
+    function removeItem(index){ selectedList.splice(index, 1); renderSelected(); }
 
     // ====== 保存・表示 ======
     saveBtn.addEventListener('click', saveData);
     csvBtn.addEventListener('click', exportCSV);
-    resetBtn.addEventListener('click', resetApp); // 追加
+    resetBtn.addEventListener('click', resetApp);
 
     function saveData(){
       const name = document.getElementById('personName').value.trim();
@@ -919,7 +902,7 @@
       document.body.removeChild(link);
     }
 
-    // ====== 追加: リセット＆TOPへ ======
+    // ====== リセット ======
     function resetApp(){
       if(!confirm('すべての選択・保存内容を消して最初からやり直しますか？')) return;
       input.value = '';
@@ -938,14 +921,7 @@
         { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[s]
       ));
     }
-
-    // グローバル公開（削除ボタン用）
-    window.removeItem = removeItem;
+    window.removeItem = removeItem; // ×ボタン用
   </script>
 </body>
 </html>
-
-
-
-
-</body>
