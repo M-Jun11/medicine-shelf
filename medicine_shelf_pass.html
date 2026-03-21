@@ -219,8 +219,59 @@ input,select,button{font-family:inherit;}
       <div class="manage-actions">
         <label class="import-label">&#128229; CSVインポート<input type="file" accept=".csv" style="display:none;" onchange="importCSV(this)"/></label>
         <button class="btn btn-green btn-sm" onclick="exportCurrentCSV()">&#128228; CSV出力</button>
-        <button class="btn btn-gray btn-sm" onclick="addNewRow()">&#65291; 追加</button>
         <button class="btn btn-gray btn-sm" onclick="resetToDefault()">&#128260; 初期データ</button>
+      </div>
+    </div>
+
+    <!-- 管理画面 検索バー -->
+    <div class="card" style="padding:14px 16px;margin-bottom:10px;">
+      <div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap;">
+        <div style="position:relative;flex:1;min-width:200px;">
+          <span style="position:absolute;left:12px;top:50%;transform:translateY(-50%);font-size:18px;opacity:.4;">&#128269;</span>
+          <input type="text" id="manage-search" placeholder="一般名・後発品名・先発品名で絞り込み"
+            oninput="renderManage()"
+            style="width:100%;padding:11px 14px 11px 40px;border:2px solid #e2e8f0;border-radius:10px;font-size:14px;outline:none;"/>
+        </div>
+        <button onclick="toggleAddForm()" id="add-form-toggle-btn"
+          style="padding:10px 18px;background:#0077b6;color:#fff;border:none;border-radius:10px;font-size:14px;font-weight:700;cursor:pointer;white-space:nowrap;">
+          &#65291; 1件追加
+        </button>
+      </div>
+    </div>
+
+    <!-- 追加フォーム（初期非表示） -->
+    <div id="add-form-panel" style="display:none;" class="card">
+      <div style="font-size:15px;font-weight:700;color:#0077b6;margin-bottom:14px;">&#65291; 新しい薬品を追加</div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:10px;">
+        <div>
+          <label style="font-size:12px;color:#64748b;font-weight:600;display:block;margin-bottom:4px;">一般名称 <span style="color:#dc2626;">*</span></label>
+          <input type="text" id="add-general" placeholder="例：アムロジピン錠" style="width:100%;padding:10px 12px;border:2px solid #e2e8f0;border-radius:8px;font-size:14px;outline:none;"/>
+        </div>
+        <div>
+          <label style="font-size:12px;color:#64748b;font-weight:600;display:block;margin-bottom:4px;">棚の種類 <span style="color:#dc2626;">*</span></label>
+          <div style="display:flex;gap:6px;">
+            <select id="add-shelf-sel" style="flex:1;padding:10px 8px;border:2px solid #e2e8f0;border-radius:8px;font-size:14px;outline:none;background:#fff;" onchange="toggleAddShelfCustom()">
+              <option value="">選択してください</option>
+            </select>
+            <input type="text" id="add-shelf-custom" placeholder="その他" style="flex:1;padding:10px 12px;border:2px solid #e2e8f0;border-radius:8px;font-size:14px;outline:none;display:none;"/>
+          </div>
+        </div>
+        <div>
+          <label style="font-size:12px;color:#64748b;font-weight:600;display:block;margin-bottom:4px;">後発/ジェネリック</label>
+          <input type="text" id="add-generic" placeholder="例：アムロジピン錠5mg「サワイ」" style="width:100%;padding:10px 12px;border:2px solid #e2e8f0;border-radius:8px;font-size:14px;outline:none;"/>
+        </div>
+        <div>
+          <label style="font-size:12px;color:#64748b;font-weight:600;display:block;margin-bottom:4px;">先発</label>
+          <input type="text" id="add-brand" placeholder="例：ノルバスク錠5mg" style="width:100%;padding:10px 12px;border:2px solid #e2e8f0;border-radius:8px;font-size:14px;outline:none;"/>
+        </div>
+        <div style="grid-column:1/-1;">
+          <label style="font-size:12px;color:#64748b;font-weight:600;display:block;margin-bottom:4px;">Note</label>
+          <input type="text" id="add-note" placeholder="備考・メモ" style="width:100%;padding:10px 12px;border:2px solid #e2e8f0;border-radius:8px;font-size:14px;outline:none;"/>
+        </div>
+      </div>
+      <div style="display:flex;gap:8px;">
+        <button onclick="submitAddForm()" style="padding:10px 22px;background:#059669;color:#fff;border:none;border-radius:8px;font-size:14px;font-weight:700;cursor:pointer;">追加する</button>
+        <button onclick="toggleAddForm()" style="padding:10px 16px;background:#f1f5f9;color:#64748b;border:1px solid #e2e8f0;border-radius:8px;font-size:14px;cursor:pointer;">キャンセル</button>
       </div>
     </div>
     <div class="card" style="padding:0;overflow:auto;">
@@ -435,12 +486,26 @@ function renderSelTab() {
 /* ===== データ管理 ===== */
 function renderManage() {
   var tbody = document.getElementById('manage-tbody');
-  document.getElementById('manage-count').textContent = medicines.length+'件';
+  // 管理画面の検索フィルター
+  var mq = document.getElementById('manage-search');
+  var q = mq ? norm(mq.value.trim()) : '';
+  var displayList = q ? medicines.filter(function(m){
+    return norm(m.general).indexOf(q)>=0 || norm(m.generic).indexOf(q)>=0 || norm(m.brand).indexOf(q)>=0;
+  }) : medicines;
+  document.getElementById('manage-count').textContent = q ? (displayList.length + '件ヒット / 全' + medicines.length + '件') : medicines.length+'件';
   tbody.innerHTML='';
   var shelfSet={};
   medicines.forEach(function(m){if(m.shelf)shelfSet[m.shelf]=true;});
   var shelfOptions=Object.keys(shelfSet).sort();
-  medicines.forEach(function(med,i){
+  // 追加フォームの棚セレクト更新
+  var addSel = document.getElementById('add-shelf-sel');
+  if (addSel && addSel.options.length <= 1) {
+    shelfOptions.forEach(function(s){
+      var opt=document.createElement('option'); opt.value=s; opt.textContent=s; addSel.appendChild(opt);
+    });
+    var other=document.createElement('option'); other.value='__custom__'; other.textContent='その他（直接入力）'; addSel.appendChild(other);
+  }
+  displayList.forEach(function(med,i){
     var tr=document.createElement('tr');
     if (editingId===med.id) {
       var opts=shelfOptions.map(function(s){return '<option value="'+esc(s)+'"'+(s===med.shelf?' selected':'')+'>'+esc(s)+'</option>';}).join('')+'<option value="__custom__">その他(入力)</option>';
@@ -488,10 +553,47 @@ function deleteMed(id){
   saveMeds();buildShelfTabs();doSearch();renderManage();
   toast('削除しました');
 }
-function addNewRow(){
-  var newId=Date.now();
-  medicines.push({id:newId,general:'（新規）',generic:'',brand:'',shelf:'通常',note:''});
-  saveMeds();buildShelfTabs();renderManage();startEdit(newId);
+function toggleAddForm() {
+  var panel = document.getElementById('add-form-panel');
+  var btn = document.getElementById('add-form-toggle-btn');
+  var isOpen = panel.style.display !== 'none';
+  panel.style.display = isOpen ? 'none' : '';
+  btn.textContent = isOpen ? '＋ 1件追加' : '✕ 閉じる';
+  if (!isOpen) {
+    // フォームをリセット
+    ['add-general','add-generic','add-brand','add-note'].forEach(function(id){
+      document.getElementById(id).value='';
+    });
+    document.getElementById('add-shelf-sel').value='';
+    document.getElementById('add-shelf-custom').style.display='none';
+    document.getElementById('add-shelf-custom').value='';
+    setTimeout(function(){document.getElementById('add-general').focus();},100);
+  }
+}
+function toggleAddShelfCustom() {
+  var sel = document.getElementById('add-shelf-sel');
+  var custom = document.getElementById('add-shelf-custom');
+  custom.style.display = sel.value==='__custom__' ? '' : 'none';
+}
+function submitAddForm() {
+  var general = document.getElementById('add-general').value.trim();
+  var shelfSel = document.getElementById('add-shelf-sel').value;
+  var shelfCustom = document.getElementById('add-shelf-custom').value.trim();
+  var shelf = shelfSel==='__custom__' ? shelfCustom : shelfSel;
+  if (!general) { toast('⚠️ 一般名称は必須です'); return; }
+  if (!shelf) { toast('⚠️ 棚の種類を選択または入力してください'); return; }
+  var newMed = {
+    id: Date.now(),
+    general: general,
+    generic: document.getElementById('add-generic').value.trim(),
+    brand: document.getElementById('add-brand').value.trim(),
+    shelf: shelf,
+    note: document.getElementById('add-note').value.trim()
+  };
+  medicines.push(newMed);
+  saveMeds(); buildShelfTabs(); renderManage();
+  toggleAddForm();
+  toast('✅ 追加しました：' + general);
 }
 function updateBulkFromSelect(){
   var sel=document.getElementById('bulk-from');
