@@ -8,8 +8,6 @@
 *{box-sizing:border-box;margin:0;padding:0;}
 body{font-family:'Helvetica Neue',Arial,'Hiragino Kaku Gothic ProN',sans-serif;background:#f0f4f8;color:#1e293b;min-height:100vh;font-size:16px;}
 input,select,button{font-family:inherit;}
-
-/* 認証 */
 #auth-screen{display:flex;align-items:center;justify-content:center;min-height:100vh;background:linear-gradient(135deg,#1a2a4a 0%,#0d4f6e 50%,#1a3a5c 100%);}
 .auth-box{background:rgba(255,255,255,.08);backdrop-filter:blur(20px);border:1px solid rgba(255,255,255,.15);border-radius:20px;padding:48px 40px;width:340px;text-align:center;box-shadow:0 20px 60px rgba(0,0,0,.4);}
 .auth-icon{font-size:56px;margin-bottom:16px;}
@@ -22,42 +20,33 @@ input,select,button{font-family:inherit;}
 .auth-error{color:#ff6b6b;font-size:14px;margin-bottom:10px;min-height:20px;}
 .auth-btn{width:100%;padding:15px;background:linear-gradient(135deg,#00b4d8,#0077b6);color:#fff;border:none;border-radius:12px;font-size:17px;font-weight:700;cursor:pointer;}
 @keyframes shake{0%,100%{transform:translateX(0)}25%{transform:translateX(-8px)}75%{transform:translateX(8px)}}
-
-/* ヘッダー */
 #main-screen{display:none;}
 .header{background:linear-gradient(135deg,#1a2a4a,#0d4f6e);padding:12px 16px;display:flex;align-items:center;justify-content:space-between;}
 .header-title{color:#fff;font-size:16px;font-weight:700;}
 .header-sub{color:rgba(255,255,255,.45);font-size:11px;}
+.header-right{display:flex;align-items:center;gap:10px;}
+.sync-status{font-size:11px;padding:4px 10px;border-radius:10px;font-weight:600;}
+.sync-ok{background:rgba(5,150,105,.3);color:#6ee7b7;}
+.sync-ing{background:rgba(251,191,36,.3);color:#fcd34d;}
+.sync-err{background:rgba(220,38,38,.3);color:#fca5a5;}
 .logout-btn{background:rgba(255,255,255,.1);color:rgba(255,255,255,.75);border:1px solid rgba(255,255,255,.2);padding:8px 14px;border-radius:8px;cursor:pointer;font-size:13px;}
-
-/* タブバー（2段） */
 .tabs-wrap{background:#fff;border-bottom:2px solid #e2e8f0;position:sticky;top:0;z-index:50;}
 .tabs-row{display:flex;overflow-x:auto;-webkit-overflow-scrolling:touch;}
 .tabs-row::-webkit-scrollbar{display:none;}
 .tab-btn{padding:11px 14px;border:none;background:none;cursor:pointer;font-size:13px;color:#64748b;font-weight:500;border-bottom:3px solid transparent;white-space:nowrap;flex-shrink:0;transition:all .15s;}
 .tab-btn.active{color:#0077b6;font-weight:700;border-bottom-color:#0077b6;}
-.tab-btn.active-sel{color:#059669;font-weight:700;border-bottom-color:#059669;}
-.tab-btn:hover:not(.active):not(.active-sel){background:#f8fafc;color:#334155;}
-
-/* タブ区切り線 */
-.tabs-divider{height:2px;background:#e2e8f0;}
+.tab-btn:hover:not(.active){background:#f8fafc;color:#334155;}
 .tabs-row2{display:flex;overflow-x:auto;-webkit-overflow-scrolling:touch;background:#f8fafc;}
 .tabs-row2::-webkit-scrollbar{display:none;}
 .tab-shelf-btn{padding:8px 12px;border:none;background:none;cursor:pointer;font-size:12px;color:#64748b;font-weight:500;border-bottom:3px solid transparent;white-space:nowrap;flex-shrink:0;transition:all .15s;}
 .tab-shelf-btn.active{color:#0077b6;font-weight:700;border-bottom-color:#0077b6;background:#fff;}
-
-/* コンテンツ */
 .content{padding:16px;}
-
-/* 検索バー */
 .search-card{background:#fff;border-radius:14px;padding:16px;box-shadow:0 2px 12px rgba(0,0,0,.06);margin-bottom:14px;}
 .search-wrap{position:relative;}
 .search-input{width:100%;padding:16px 18px 16px 52px;border:3px solid #e2e8f0;border-radius:14px;font-size:18px;outline:none;transition:all .2s;background:#fff;}
 .search-input:focus{border-color:#00b4d8;box-shadow:0 0 0 4px rgba(0,180,216,.1);}
 .search-icon{position:absolute;left:16px;top:50%;transform:translateY(-50%);font-size:22px;opacity:.4;}
 .search-meta{margin-top:10px;color:#94a3b8;font-size:13px;}
-
-/* 薬品グリッド */
 .med-list{display:flex;flex-direction:column;gap:10px;}
 .med-card{background:#fff;border:2px solid #e2e8f0;border-radius:14px;padding:16px;cursor:pointer;transition:all .18s;display:flex;align-items:flex-start;gap:14px;}
 .med-card:hover{border-color:#7dd3f0;box-shadow:0 4px 16px rgba(0,120,180,.12);}
@@ -72,20 +61,10 @@ input,select,button{font-family:inherit;}
 .med-row-label{color:#94a3b8;font-size:12px;font-weight:600;flex-shrink:0;padding-top:1px;}
 .med-note{font-size:13px;color:#d97706;margin-top:4px;}
 .shelf-badge{display:inline-block;background:#f1f5f9;color:#475569;padding:4px 10px;border-radius:8px;font-size:12px;font-weight:600;margin-top:8px;}
-
-/* 空状態 */
 .empty-state{text-align:center;padding:60px 20px;}
 .empty-icon{font-size:64px;margin-bottom:16px;}
 .empty-text{font-size:17px;font-weight:600;color:#94a3b8;margin-bottom:8px;}
 .empty-sub{font-size:14px;color:#cbd5e1;}
-
-/* ===== 選択中タブ ===== */
-.sel-header{background:#fff;border-radius:14px;padding:16px;box-shadow:0 2px 12px rgba(0,0,0,.06);margin-bottom:14px;display:flex;align-items:center;justify-content:space-between;}
-.sel-header-title{font-size:18px;font-weight:700;color:#059669;}
-.sel-count-badge{background:#059669;color:#fff;padding:4px 14px;border-radius:20px;font-size:15px;font-weight:700;}
-.btn-clear-all{padding:10px 18px;background:#fff0f0;color:#dc2626;border:2px solid #fecaca;border-radius:10px;font-size:14px;font-weight:700;cursor:pointer;}
-
-/* 選択中カード（大きく・見やすく） */
 .sel-list{display:flex;flex-direction:column;gap:12px;}
 .sel-card{background:#fff;border:2px solid #e2e8f0;border-radius:16px;padding:20px;position:relative;}
 .sel-card-general{font-size:20px;font-weight:700;color:#1e293b;margin-bottom:10px;display:flex;align-items:center;gap:10px;flex-wrap:wrap;line-height:1.4;}
@@ -94,8 +73,7 @@ input,select,button{font-family:inherit;}
 .sel-card-label{font-size:13px;color:#94a3b8;font-weight:700;flex-shrink:0;min-width:40px;}
 .sel-card-shelf{display:inline-block;background:#f0f9ff;color:#0077b6;padding:5px 14px;border-radius:10px;font-size:14px;font-weight:700;margin-top:10px;}
 .sel-remove-btn{position:absolute;top:14px;right:14px;width:36px;height:36px;border-radius:50%;background:#fff0f0;border:2px solid #fecaca;color:#dc2626;font-size:18px;font-weight:700;cursor:pointer;display:flex;align-items:center;justify-content:center;line-height:1;}
-
-/* データ管理タブ */
+.btn-clear-all{padding:10px 18px;background:#fff0f0;color:#dc2626;border:2px solid #fecaca;border-radius:10px;font-size:14px;font-weight:700;cursor:pointer;}
 .manage-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:14px;flex-wrap:wrap;gap:10px;}
 .manage-title{font-size:17px;font-weight:700;}
 .manage-actions{display:flex;gap:8px;flex-wrap:wrap;}
@@ -127,11 +105,12 @@ input,select,button{font-family:inherit;}
 .import-hint{background:#f0f9ff;border:1.5px solid #00b4d8;border-radius:10px;padding:14px 16px;margin-bottom:14px;font-size:12px;color:#0077b6;line-height:1.7;}
 .import-hint strong{display:block;margin-bottom:4px;font-size:13px;}
 .import-hint code{background:#e0f7ff;padding:1px 5px;border-radius:4px;font-family:monospace;}
-
-/* トースト */
 .toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%);background:#1e293b;color:#fff;padding:14px 28px;border-radius:14px;font-size:15px;font-weight:600;z-index:9999;box-shadow:0 8px 24px rgba(0,0,0,.3);opacity:0;transition:opacity .3s;pointer-events:none;}
 .toast.show{opacity:1;}
-
+.loading-overlay{position:fixed;inset:0;background:rgba(255,255,255,.8);display:flex;align-items:center;justify-content:center;z-index:9998;flex-direction:column;gap:16px;}
+.loading-spinner{width:48px;height:48px;border:4px solid #e2e8f0;border-top-color:#0077b6;border-radius:50%;animation:spin .8s linear infinite;}
+@keyframes spin{to{transform:rotate(360deg)}}
+.loading-text{color:#64748b;font-size:15px;font-weight:600;}
 @media(min-width:600px){
   .med-list{display:grid;grid-template-columns:repeat(auto-fill,minmax(320px,1fr));}
   .sel-list{display:grid;grid-template-columns:repeat(auto-fill,minmax(340px,1fr));}
@@ -140,7 +119,6 @@ input,select,button{font-family:inherit;}
 </head>
 <body>
 
-<!-- 認証 -->
 <div id="auth-screen">
   <div class="auth-box">
     <div class="auth-icon">&#128138;</div>
@@ -152,27 +130,26 @@ input,select,button{font-family:inherit;}
   </div>
 </div>
 
-<!-- メイン -->
 <div id="main-screen">
   <div class="header">
     <div>
       <div class="header-title">&#128138; 医薬品棚管理システム</div>
       <div class="header-sub">Medicine Shelf Manager</div>
     </div>
-    <button class="logout-btn" onclick="doLogout()">ログアウト</button>
+    <div class="header-right">
+      <span id="sync-status" class="sync-status sync-ok">☁ 同期済</span>
+      <button class="logout-btn" onclick="doLogout()">ログアウト</button>
+    </div>
   </div>
 
-  <!-- タブ（1段目） -->
   <div class="tabs-wrap">
-    <div class="tabs-row" id="tabs-row1">
-      <button class="tab-btn active" onclick="switchMainTab('search',this)" id="tab-search-btn">&#128269; 薬品検索</button>
+    <div class="tabs-row">
+      <button class="tab-btn active" onclick="switchMainTab('search',this)">&#128269; 薬品検索</button>
       <button class="tab-btn" onclick="switchMainTab('manage',this)">&#9999; データ管理</button>
     </div>
-    <!-- 棚フィルター（2段目、検索タブのみ表示） -->
     <div id="shelf-tabs-row" class="tabs-row2"></div>
   </div>
 
-  <!-- 検索タブ -->
   <div id="tab-search" class="content">
     <div class="search-card">
       <div class="search-wrap">
@@ -184,8 +161,6 @@ input,select,button{font-family:inherit;}
       <div id="search-meta" class="search-meta">薬品名を入力して検索してください</div>
     </div>
     <div class="med-list" id="med-list"></div>
-
-    <!-- 選択済みパネル -->
     <div id="sel-panel" style="display:none;margin-top:20px;">
       <div style="background:#fff;border-radius:14px;padding:16px;box-shadow:0 2px 12px rgba(0,0,0,.06);margin-bottom:10px;display:flex;align-items:center;justify-content:space-between;">
         <div style="font-size:18px;font-weight:700;color:#059669;">&#9989; 選択中の薬品 <span id="sel-count-badge" style="background:#059669;color:#fff;padding:3px 12px;border-radius:14px;font-size:14px;margin-left:6px;">0件</span></div>
@@ -195,10 +170,6 @@ input,select,button{font-family:inherit;}
     </div>
   </div>
 
-  <!-- 選択済みパネル（検索タブ内・下部固定表示） -->
-  <div id="tab-selected" style="display:none;"></div>
-
-  <!-- データ管理タブ -->
   <div id="tab-manage" class="content" style="display:none;">
     <div class="bulk-panel">
       <div class="bulk-title">&#127991; 一括棚変更</div>
@@ -222,8 +193,6 @@ input,select,button{font-family:inherit;}
         <button class="btn btn-gray btn-sm" onclick="resetToDefault()">&#128260; 初期データ</button>
       </div>
     </div>
-
-    <!-- 管理画面 検索バー -->
     <div class="card" style="padding:14px 16px;margin-bottom:10px;">
       <div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap;">
         <div style="position:relative;flex:1;min-width:200px;">
@@ -238,8 +207,6 @@ input,select,button{font-family:inherit;}
         </button>
       </div>
     </div>
-
-    <!-- 追加フォーム（初期非表示） -->
     <div id="add-form-panel" style="display:none;" class="card">
       <div style="font-size:15px;font-weight:700;color:#0077b6;margin-bottom:14px;">&#65291; 新しい薬品を追加</div>
       <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:10px;">
@@ -283,18 +250,48 @@ input,select,button{font-family:inherit;}
   </div>
 </div>
 
+<div id="loading-overlay" class="loading-overlay">
+  <div class="loading-spinner"></div>
+  <div class="loading-text">データを読み込み中...</div>
+</div>
+
 <div class="toast" id="toast"></div>
 
-<script>
-var PASSWORD = "321899";
-var STORAGE_KEY = "med_shelf_data";
-var INITIAL_DATA = [{"id":1,"general":"フルスルチアミン錠","generic":"フルスルチアミン錠２５ｍｇ「トーワ」","brand":"２５ｍｇアリナミンＦ糖衣錠","shelf":"通常","note":"ー"},{"id":2,"general":"炭酸リチウム錠","generic":"炭酸リチウム錠２００","brand":"D-1-4","shelf":"通常","note":"ー"},{"id":3,"general":"非ピリン系感冒剤顆粒","generic":"なし","brand":"ＰＬ配合顆粒","shelf":"通常","note":"ー"},{"id":4,"general":"非ピリン系感冒剤（４）顆粒","generic":"取り扱いなし","brand":"ＰＬ配合顆粒（ピーエル）","shelf":"通常","note":"ー"},{"id":5,"general":"タカヂアスターゼ・生薬配合剤散","generic":"後発品なし","brand":"Ｓ・Ｍ配合散","shelf":"通常","note":""},{"id":6,"general":"炭酸リチウム錠","generic":"炭酸リチウム錠２００ｍｇ「フジナガ」","brand":"リーマス錠２００","shelf":"劇薬","note":"ー"},{"id":7,"general":"ピラゾロン系解熱鎮痛消炎配合剤顆粒","generic":"なし","brand":"ＳＧ配合顆粒","shelf":"通常","note":"ー"},{"id":8,"general":"酢酸亜鉛水和物錠","generic":"酢酸亜鉛錠２５ｍｇ「ノーベル」","brand":"ノベルジン錠２５ｍｇ","shelf":"劇薬","note":"ー"},{"id":9,"general":"カルベジロール錠","generic":"カルベジロール錠１．２５ｍｇ「ＤＳＥＰ」","brand":"ＳＧ配合顆粒","shelf":"通常","note":"ー"},{"id":10,"general":"カルベジロール錠","generic":"カルベジロール錠１０ｍｇ「ＤＳＥＰ」","brand":"アーチスト錠１０ｍｇ","shelf":"通常","note":"ー"},{"id":11,"general":"カルベジロール錠","generic":"カルベジロール錠２．５ｍｇ「ＤＳＥＰ」","brand":"アーチスト錠２．５ｍｇ","shelf":"通常","note":"ー"},{"id":12,"general":"カルベジロール錠","generic":"カルベジロール錠２０ｍｇ「ＤＳＥＰ」","brand":"アーチスト錠２０ｍｇ","shelf":"通常","note":"ー"},{"id":13,"general":"一硝酸イソソルビド錠","generic":"一硝酸イソソルビド錠２０ｍｇ「サワイ」","brand":"アイトロール錠２０ｍｇ","shelf":"通常","note":"検索"},{"id":14,"general":"スプラタストトシル酸塩カプセル","generic":"なし","brand":"アイピーディカプセル１００１００ｍｇ","shelf":"通常","note":"ー"},{"id":15,"general":"ビペリデン塩酸塩錠","generic":"ビペリデン塩酸塩錠１ｍｇ「ヨシトミ」","brand":"アキネトン錠１ｍｇ","shelf":"通常","note":"検索"},{"id":16,"general":"ピオグリタゾン塩酸塩錠","generic":"ピオグリタゾン錠１５ｍｇ「武田テバ」","brand":"アクトス錠１５","shelf":"通常","note":"ー"},{"id":17,"general":"ピオグリタゾン塩酸塩錠","generic":"ピオグリタゾン錠３０ｍｇ「武田テバ」","brand":"アクトス錠３０","shelf":"通常","note":"ー"},{"id":18,"general":"乙字湯エキス細粒","generic":"後発品なし","brand":"００３クラシエ乙字湯エキス細粒","shelf":"漢方棚","note":"ー"},{"id":19,"general":"クラシエ加味逍遙散料エキス細粒","generic":"後発品なし","brand":"０２４ツムラ加味逍遙散エキス顆粒（医療用）","shelf":"漢方棚","note":"ー"},{"id":20,"general":"葛根湯エキス細粒","generic":"後発品なし","brand":"００１ツムラ葛根湯エキス顆粒（医療用）","shelf":"漢方棚","note":"ー"},{"id":21,"general":"六君子湯エキス顆粒","generic":"後発品なし","brand":"０４３ツムラ六君子湯エキス顆粒（医療用）","shelf":"漢方棚","note":"ー"},{"id":22,"general":"柴胡加竜骨牡蛎湯エキス細粒","generic":"後発品なし","brand":"クラシエ柴胡加竜骨牡蛎湯","shelf":"漢方棚","note":"ー"},{"id":23,"general":"安中散エキス顆粒","generic":"後発品なし","brand":"００５ツムラ安中散エキス顆粒（医療用）あんちゅうさん","shelf":"漢方棚","note":"ー"},{"id":24,"general":"大柴胡湯エキス顆粒","generic":"後発品なし","brand":"００８ツムラ大柴胡湯エキス顆粒（医療用）だいさいことう","shelf":"漢方棚","note":"ー"},{"id":25,"general":"半夏瀉心湯エキス顆粒","generic":"後発品なし","brand":"０１４ツムラ半夏瀉心湯エキス顆粒（医療用）はんげしゃしんとう","shelf":"漢方棚","note":"ー"},{"id":26,"general":"黄連解毒湯エキス顆粒","generic":"後発品なし","brand":"０１５ツムラ黄連解毒湯エキス顆粒（医療用）おうれんげどくとう","shelf":"漢方棚","note":"ー"},{"id":27,"general":"消風散エキス顆粒","generic":"後発品なし","brand":"０２２ツムラ消風散エキス顆粒（医療用）しょうふうさん","shelf":"漢方棚","note":"ー"},{"id":28,"general":"当帰芍薬散エキス顆粒","generic":"後発品なし","brand":"０２３ツムラ当帰芍薬散エキス顆粒（医療用）とうきしゃくやくさん","shelf":"漢方棚","note":"ー"},{"id":29,"general":"防已黄耆湯エキス顆粒","generic":"後発品なし","brand":"０２０ツムラ防已黄耆湯エキス顆粒（医療用）ぼういおうぎとう","shelf":"漢方棚","note":"ー"},{"id":30,"general":"加味逍遙散エキス顆粒","generic":"後発品なし","brand":"０２４ツムラ加味逍遙散エキス顆粒（医療用）かみしょうようさん","shelf":"漢方棚","note":"ー"},{"id":31,"general":"桂枝茯苓丸エキス顆粒","generic":"後発品なし","brand":"０２５ツムラ桂枝茯苓丸エキス顆粒（医療用）けいしぶくりゅうがん","shelf":"漢方棚","note":"ー"},{"id":32,"general":"麻黄湯エキス顆粒","generic":"後発品なし","brand":"０２７ツムラ麻黄湯エキス顆粒（医療用）まおうとう","shelf":"漢方棚","note":"ー"},{"id":33,"general":"呉茱萸湯エキス顆粒","generic":"後発品なし","brand":"０３１ツムラ呉茱萸湯エキス顆粒（医療用）ごしゅゆとう","shelf":"漢方棚","note":"ー"},{"id":34,"general":"白虎加人参湯エキス顆粒","generic":"後発品なし","brand":"０３４ツムラ白虎加人参湯エキス顆粒（医療用）びゃっこかにんじんとう","shelf":"漢方棚","note":"ー"},{"id":35,"general":"半夏白朮天麻湯エキス顆粒","generic":"後発品なし","brand":"０３７ツムラ半夏白朮天麻湯エキス顆粒（医療用）はんげびゃくじゅつてんまとう","shelf":"漢方棚","note":"ー"},{"id":36,"general":"当帰四逆加呉茱萸生姜湯エキス顆粒","generic":"後発品なし","brand":"０３８ツムラ当帰四逆加呉茱萸生姜湯エキス顆粒（医療用）とうきしぎゃくかごしゅゆしょうきょうとう","shelf":"漢方棚","note":"ー"},{"id":37,"general":"苓桂朮甘湯エキス顆粒","generic":"後発品なし","brand":"０３９ツムラ苓桂朮甘湯エキス顆粒（医療用）りょうけいじゅつかんとう","shelf":"漢方棚","note":"ー"},{"id":38,"general":"苓桂朮甘湯エキス細粒","generic":"後発品なし","brand":"０３９クラシエ苓桂朮甘湯エキス細粒りょうけいじゅつかんとう","shelf":"漢方棚","note":"ー"},{"id":39,"general":"釣藤散エキス顆粒","generic":"後発品なし","brand":"０４７ツムラ釣藤散エキス顆粒（医療用）ちょうとうさん","shelf":"漢方棚","note":"ー"},{"id":40,"general":"七物降下湯エキス顆粒","generic":"後発品なし","brand":"０４６ツムラ七物降下湯エキス顆粒（医療用）しちもつこうかとう","shelf":"漢方棚","note":"ー"},{"id":41,"general":"荊芥連翹湯エキス顆粒","generic":"後発品なし","brand":"０５０ツムラ荊芥連翹湯エキス顆粒（医療用）けいがいれんぎょうとう","shelf":"漢方棚","note":"ー"},{"id":42,"general":"潤腸湯エキス顆粒","generic":"後発品なし","brand":"０５１ツムラ潤腸湯エキス顆粒（医療用）じゅんちょうとう","shelf":"漢方棚","note":"ー"},{"id":43,"general":"猪苓湯エキス顆粒","generic":"後発品なし","brand":"０４０ツムラ猪苓湯エキス顆粒（医療用）ちょれいとう","shelf":"漢方棚","note":"ー"},{"id":44,"general":"疎経活血湯エキス顆粒","generic":"後発品なし","brand":"０５３ツムラ疎経活血湯エキス顆粒（医療用）そけいかっけつとう","shelf":"漢方棚","note":"ー"},{"id":45,"general":"桂枝加芍薬湯エキス顆粒","generic":"後発品なし","brand":"０６０ツムラ桂枝加芍薬湯エキス顆粒（医療用）けいしかしゃくやくとう","shelf":"漢方棚","note":"ー"},{"id":46,"general":"帰脾湯エキス顆粒","generic":"後発品なし","brand":"０６５ツムラ帰脾湯エキス顆粒（医療用）きひとう","shelf":"漢方棚","note":"ー"},{"id":47,"general":"八味地黄丸エキス顆粒","generic":"後発品なし","brand":"００７ツムラ八味地黄丸エキス顆粒（医療用）はちみじおう","shelf":"漢方棚","note":"ー"},{"id":48,"general":"葛根湯エキス顆粒","generic":"後発品なし","brand":"００１ツムラ葛根湯エキス顆粒（医療用）かっこんとう","shelf":"漢方棚","note":"ー"},{"id":49,"general":"柴胡加竜骨牡蛎湯エキス顆粒","generic":"後発品なし","brand":"０１２ツムラ柴胡加竜骨牡蛎湯エキス顆粒（医療用）さいこかりゅうこつぼれいとう","shelf":"漢方棚","note":"ー"},{"id":50,"general":"半夏厚朴湯エキス顆粒","generic":"後発品なし","brand":"０１６ツムラ半夏厚朴湯エキス顆粒（医療用）はんげこうぼくとう","shelf":"漢方棚","note":"ー"},{"id":51,"general":"五苓散エキス顆粒","generic":"後発品なし","brand":"０１７ツムラ五苓散エキス顆粒（医療用）ごれいさん","shelf":"漢方棚","note":"ー"},{"id":52,"general":"小青竜湯エキス顆粒","generic":"後発品なし","brand":"０１９ツムラ小青竜湯エキス顆粒（医療用）しょうせいりゅうとう","shelf":"漢方棚","note":"ー"},{"id":53,"general":"桂枝加竜骨牡蛎湯エキス顆粒","generic":"後発品なし","brand":"０２６ツムラ桂枝加竜骨牡蛎湯エキス顆粒（医療用）けいしかりゅうこつぼれいとう","shelf":"漢方棚","note":"ー"},{"id":54,"general":"麦門冬湯エキス顆粒","generic":"後発品なし","brand":"０２９ツムラ麦門冬湯エキス顆粒（医療用）ばくもんどうとう","shelf":"漢方棚","note":"ー"},{"id":55,"general":"六君子湯エキス顆粒","generic":"後発品なし","brand":"０４３ツムラ六君子湯エキス顆粒（医療用）りっくんしとう","shelf":"漢方棚","note":"ー"},{"id":56,"general":"補中益気湯エキス顆粒","generic":"後発品なし","brand":"０４１ツムラ補中益気湯エキス顆粒（医療用）ほちゅうえっきとう","shelf":"漢方棚","note":"ー"},{"id":57,"general":"十全大補湯エキス顆粒","generic":"後発品なし","brand":"０４８ツムラ十全大補湯エキス顆粒（医療用）じゅうぜんたいほとう","shelf":"漢方棚","note":"ー"},{"id":58,"general":"抑肝散エキス顆粒","generic":"後発品なし","brand":"０５４ツムラ抑肝散エキス顆粒（医療用）","shelf":"漢方棚","note":"ー"},{"id":59,"general":"防風通聖散エキス顆粒","generic":"後発品なし","brand":"０６２ツムラ防風通聖散エキス顆粒（医療用）ぼうふうつうしょうさん","shelf":"漢方棚","note":"ー"},{"id":60,"general":"芍薬甘草湯エキス顆粒","generic":"後発品なし","brand":"０６８ツムラ芍薬甘草湯エキス顆粒（医療用）しゃくやくかんぞうとう","shelf":"漢方棚","note":"ー"},{"id":61,"general":"柴朴湯エキス顆粒","generic":"後発品なし","brand":"０９６ツムラ柴朴湯エキス顆粒（医療用）さいぼくとう","shelf":"漢方棚","note":"ー"},{"id":62,"general":"大黄甘草湯エキス顆粒","generic":"後発品なし","brand":"０８４ツムラ大黄甘草湯エキス顆粒（医療用）だいおうかんぞうとう","shelf":"漢方棚","note":"ー"},{"id":63,"general":"大建中湯エキス顆粒","generic":"後発品なし","brand":"１００ツムラ大建中湯エキス顆粒（医療用）だいけんちゅうとう","shelf":"漢方棚","note":"ー"},{"id":64,"general":"通導散エキス顆粒","generic":"後発品なし","brand":"１０５ツムラ通導散エキス顆粒（医療用）つうどうさん","shelf":"漢方棚","note":"ー"},{"id":65,"general":"人参養栄湯エキス顆粒","generic":"後発品なし","brand":"１０８ツムラ人参養栄湯エキス顆粒（医療用）","shelf":"漢方棚","note":"ー"},{"id":66,"general":"小柴胡湯加桔梗石膏エキス顆粒","generic":"後発品なし","brand":"１０９ツムラ小柴胡湯加桔梗石膏エキス顆粒（医療用）しょうさいことうかききょうせっこう","shelf":"漢方棚","note":"ー"},{"id":67,"general":"酸棗仁湯エキス顆粒","generic":"後発品なし","brand":"１０３ツムラ酸棗仁湯エキス顆粒（医療用）さんそうにんとう","shelf":"漢方棚","note":"ー"},{"id":68,"general":"牛車腎気丸エキス顆粒","generic":"後発品なし","brand":"１０７ツムラ牛車腎気丸エキス顆粒（医療用）ごしゃじんきがん","shelf":"漢方棚","note":"ー"},{"id":69,"general":"排膿散及湯エキス顆粒","generic":"後発品なし","brand":"１２２ツムラ排膿散及湯エキス顆粒（医療用）はいのうさんきょうとう","shelf":"漢方棚","note":"ー"},{"id":70,"general":"桂枝茯苓丸加よく苡仁エキス顆粒","generic":"後発品なし","brand":"１２５ツムラ桂枝茯苓丸加よく苡仁エキス顆粒（医療用）けいしぶくりょうがんかよくいにん","shelf":"漢方棚","note":"ー"},{"id":71,"general":"清暑益気湯エキス顆粒","generic":"後発品なし","brand":"１３６ツムラ清暑益気湯エキス顆粒（医療用）せいしょえっきとう","shelf":"漢方棚","note":"ー"},{"id":72,"general":"茵ちん五苓散エキス顆粒","generic":"後発品なし","brand":"１１７ツムラ茵ちん五苓散エキス顆粒（医療用）いんちんごれいさん","shelf":"漢方棚","note":"ー"},{"id":73,"general":"麻子仁丸エキス顆粒","generic":"後発品なし","brand":"１２６ツムラ麻子仁丸エキス顆粒（医療用）","shelf":"漢方棚","note":"ー"},{"id":74,"general":"桔梗湯エキス顆粒","generic":"後発品なし","brand":"１３８ツムラ桔梗湯エキス顆粒（医療用）ききょうとう","shelf":"漢方棚","note":"ー"},{"id":75,"general":"ブシ末錠","generic":"後発品なし","brand":"アコニンサン錠","shelf":"通常","note":""},{"id":76,"general":"アコチアミド塩酸塩水和物錠","generic":"後発品なし","brand":"アコファイド錠100ｍｇ","shelf":"通常","note":"ー"},{"id":77,"general":"メサラジン腸溶錠","generic":"メサラジン腸溶錠４００ｍｇ「ＶＴＲＳ」","brand":"アサコール錠４００ｍｇ","shelf":"通常","note":"検索"},{"id":78,"general":"サラゾスルファピリジン腸溶錠","generic":"サラゾスルファピリジン２５０ｍｇ腸溶錠","brand":"アザルフィジンEN錠250ｍｇ","shelf":"通常","note":"ー"},{"id":79,"general":"ニザチジン錠","generic":"なし","brand":"アシノン錠１５０ｍｇ","shelf":"通常","note":"ー"},{"id":80,"general":"ニザチジン錠","generic":"ニザチジンカプセル75ｍｇ","brand":"アシノン錠75ｍｇ","shelf":"通常","note":"ー"},{"id":81,"general":"アジルサルタン錠","generic":"アジルサルタン錠１０ｍｇ「武田テバ」","brand":"アジルバ錠１０ｍｇ","shelf":"通常","note":"ー"},{"id":82,"general":"アジルサルタン錠","generic":"アジルサルタン錠２０ｍｇ「武田テバ」","brand":"アジルバ錠２０ｍｇ","shelf":"通常","note":"ー"},{"id":83,"general":"葛根湯エキス細粒","generic":"後発品なし","brand":"００１クラシエ葛根湯エキス細粒かっこんとう","shelf":"漢方棚","note":"ー"},{"id":84,"general":"乙字湯エキス細粒","generic":"後発品なし","brand":"００３クラシエ乙字湯エキス細粒おつじとう","shelf":"漢方棚","note":"ー"},{"id":85,"general":"柴胡加竜骨牡蛎湯エキス顆粒","generic":"後発品なし","brand":"０１２クラシエ柴胡加竜骨牡蛎湯エキス顆粒さいかかりゅうこつぼれいとう","shelf":"漢方棚","note":"ー"},{"id":86,"general":"加味逍遙散エキス顆粒","generic":"後発品なし","brand":"０２４クラシエ加味逍遙散エキス顆粒かみしょうようさんりょう","shelf":"漢方棚","note":"ー"},{"id":87,"general":"アジルサルタン錠","generic":"アジルサルタン錠４０ｍｇ「武田テバ」","brand":"アジルバ錠４０ｍｇ","shelf":"通常","note":"ー"},{"id":88,"general":"六君子湯エキス細粒","generic":"後発品なし","brand":"０４３クラシエ六君子湯エキス細粒りっくんしとう","shelf":"漢方棚","note":"ー"},{"id":89,"general":"五苓散料エキス錠","generic":"後発品なし","brand":"０１７クラシエ五苓散料エキス錠ごれいさんりょう","shelf":"漢方棚","note":"ー"},{"id":90,"general":"ジメモルファンリン酸塩錠","generic":"後発品なし","brand":"アストミン錠１０ｍｇ","shelf":"通常","note":""},{"id":91,"general":"苓桂朮甘湯エキス細粒","generic":"後発品なし","brand":"０３９クラシエ苓桂朮甘湯エキス細粒りょうけいじゅつかんとう","shelf":"漢方棚","note":"ー"},{"id":92,"general":"人参養栄湯エキス細粒","generic":"後発品なし","brand":"１０８クラシエ人参養栄湯エキス細粒にんじんようえいとう","shelf":"漢方棚","note":"ー"},{"id":93,"general":"防風通聖散料エキス細粒","generic":"後発品なし","brand":"０６２クラシエ防風通聖散料エキス細粒ぼうふうつうしょうさんりょう","shelf":"漢方棚","note":"ー"},{"id":94,"general":"アズレンスルホン酸ナトリウム水和物トローチ","generic":"後発品なし","brand":"アズノールST錠口腔用５ｍｇ","shelf":"通常","note":"ー"},{"id":95,"general":"Ｌ－アスパラギン酸カルシウム水和物錠","generic":"Ｌ－アスパラギン酸Ｃａ錠２００ｍｇ「サワイ」","brand":"アスパラ-CA錠２００","shelf":"通常","note":"検索"},{"id":96,"general":"Ｌ－アスパラギン酸カリウム錠","generic":"Ｌ-アスパラギン酸Ｋ錠300ｍｇ「アメル」","brand":"アスパラカリウム錠300ｍｇ","shelf":"通常","note":"ー"},{"id":97,"general":"アスピリン・ダイアルミネート錠","generic":"バファリン配合錠Ａ８１","brand":"アスピリン・ダイアルミネートＡ８１錠","shelf":"通常","note":"検索"},{"id":98,"general":"アスピリン腸溶錠","generic":"バイアスピリン錠１００ｍｇ","brand":"アスピリン腸溶錠100ｍｇ（標準品）","shelf":"通常","note":"検索"},{"id":99,"general":"エグアレンナトリウム水和物錠","generic":"なし","brand":"アズロキサ錠１５ｍｇ","shelf":"通常","note":"ー"},{"id":100,"general":"アゼラスチン塩酸塩錠","generic":"アゼラスチン塩酸塩錠１ｍｇ「ＮＩＧ」","brand":"アゼプチン錠１ｍｇ","shelf":"通常","note":"検索"}];
+<!-- Firebase SDK -->
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+import { getFirestore, doc, getDoc, setDoc, onSnapshot } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
 
+const firebaseConfig = {
+  apiKey: "AIzaSyDF06cAdw0mQ1yYAxA0AuSJCc4GrtNk4HY",
+  authDomain: "med-shelf-bc28a.firebaseapp.com",
+  projectId: "med-shelf-bc28a",
+  storageBucket: "med-shelf-bc28a.firebasestorage.app",
+  messagingSenderId: "738332731936",
+  appId: "1:738332731936:web:bab656b84c81adb1fe6a45"
+};
+
+const app = initializeApp(firebaseConfig);
+const db = getFirestore(app);
+const DATA_DOC = doc(db, "medshelf", "medicines");
+
+var PASSWORD = "321899";
 var medicines = [];
 var selected = [];
 var currentShelf = "ALL";
-var currentMainTab = "search";
 var editingId = null;
+var isSaving = false;
+var unsubscribe = null;
+
+var INITIAL_DATA = [{"id":1,"general":"フルスルチアミン錠","generic":"フルスルチアミン錠２５ｍｇ「トーワ」","brand":"２５ｍｇアリナミンＦ糖衣錠","shelf":"通常","note":"ー"},{"id":2,"general":"炭酸リチウム錠","generic":"炭酸リチウム錠２００","brand":"D-1-4","shelf":"通常","note":"ー"},{"id":3,"general":"非ピリン系感冒剤顆粒","generic":"なし","brand":"ＰＬ配合顆粒","shelf":"通常","note":"ー"},{"id":4,"general":"非ピリン系感冒剤（４）顆粒","generic":"取り扱いなし","brand":"ＰＬ配合顆粒（ピーエル）","shelf":"通常","note":"ー"},{"id":5,"general":"タカヂアスターゼ・生薬配合剤散","generic":"後発品なし","brand":"Ｓ・Ｍ配合散","shelf":"通常","note":""},{"id":6,"general":"炭酸リチウム錠","generic":"炭酸リチウム錠２００ｍｇ「フジナガ」","brand":"リーマス錠２００","shelf":"劇薬","note":"ー"},{"id":7,"general":"ピラゾロン系解熱鎮痛消炎配合剤顆粒","generic":"なし","brand":"ＳＧ配合顆粒","shelf":"通常","note":"ー"},{"id":8,"general":"酢酸亜鉛水和物錠","generic":"酢酸亜鉛錠２５ｍｇ「ノーベル」","brand":"ノベルジン錠２５ｍｇ","shelf":"劇薬","note":"ー"},{"id":9,"general":"カルベジロール錠","generic":"カルベジロール錠１．２５ｍｇ「ＤＳＥＰ」","brand":"ＳＧ配合顆粒","shelf":"通常","note":"ー"},{"id":10,"general":"カルベジロール錠","generic":"カルベジロール錠１０ｍｇ「ＤＳＥＰ」","brand":"アーチスト錠１０ｍｇ","shelf":"通常","note":"ー"},{"id":11,"general":"カルベジロール錠","generic":"カルベジロール錠２．５ｍｇ「ＤＳＥＰ」","brand":"アーチスト錠２．５ｍｇ","shelf":"通常","note":"ー"},{"id":12,"general":"カルベジロール錠","generic":"カルベジロール錠２０ｍｇ「ＤＳＥＰ」","brand":"アーチスト錠２０ｍｇ","shelf":"通常","note":"ー"},{"id":13,"general":"一硝酸イソソルビド錠","generic":"一硝酸イソソルビド錠２０ｍｇ「サワイ」","brand":"アイトロール錠２０ｍｇ","shelf":"通常","note":"検索"},{"id":14,"general":"スプラタストトシル酸塩カプセル","generic":"なし","brand":"アイピーディカプセル１００１００ｍｇ","shelf":"通常","note":"ー"},{"id":15,"general":"ビペリデン塩酸塩錠","generic":"ビペリデン塩酸塩錠１ｍｇ「ヨシトミ」","brand":"アキネトン錠１ｍｇ","shelf":"通常","note":"検索"},{"id":16,"general":"ピオグリタゾン塩酸塩錠","generic":"ピオグリタゾン錠１５ｍｇ「武田テバ」","brand":"アクトス錠１５","shelf":"通常","note":"ー"},{"id":17,"general":"ピオグリタゾン塩酸塩錠","generic":"ピオグリタゾン錠３０ｍｇ「武田テバ」","brand":"アクトス錠３０","shelf":"通常","note":"ー"},{"id":171,"general":"ピリドスチグミン臭化物錠","generic":"後発品なし","brand":"メスチノン錠６０ｍｇ","shelf":"劇薬大きな薬棚","note":"ー"}];
+
+function setSyncStatus(s) {
+  var el = document.getElementById('sync-status');
+  if (!el) return;
+  if (s === 'ok') { el.textContent = '☁ 同期済'; el.className = 'sync-status sync-ok'; }
+  else if (s === 'ing') { el.textContent = '↑ 保存中...'; el.className = 'sync-status sync-ing'; }
+  else { el.textContent = '✕ エラー'; el.className = 'sync-status sync-err'; }
+}
 
 function toKatakana(s) {
   return String(s||'').replace(/[\u3041-\u3096]/g, function(c) {
@@ -306,32 +303,80 @@ function norm(s) { return toKatakana(String(s||'').normalize('NFKC')); }
 document.getElementById('pw-input').addEventListener('keydown', function(e) {
   if (e.key === 'Enter') doLogin();
 });
-function doLogin() {
+window.doLogin = function() {
   if (document.getElementById('pw-input').value === PASSWORD) {
     document.getElementById('auth-screen').style.display = 'none';
     document.getElementById('main-screen').style.display = 'block';
-    init();
+    document.getElementById('loading-overlay').style.display = 'flex';
+    initFirestore();
   } else {
     var inp = document.getElementById('pw-input');
     document.getElementById('auth-error').textContent = 'パスワードが違います';
     inp.classList.add('shake');
     setTimeout(function() { inp.classList.remove('shake'); document.getElementById('auth-error').textContent=''; }, 600);
   }
-}
-function doLogout() {
+};
+
+window.doLogout = function() {
+  if (unsubscribe) unsubscribe();
   document.getElementById('auth-screen').style.display = 'flex';
   document.getElementById('main-screen').style.display = 'none';
   document.getElementById('pw-input').value = '';
+  medicines = []; selected = [];
+};
+
+async function initFirestore() {
+  try {
+    // リアルタイム同期を開始
+    unsubscribe = onSnapshot(DATA_DOC, function(snap) {
+      if (snap.exists()) {
+        var data = snap.data();
+        if (data && data.list) {
+          medicines = data.list;
+          buildShelfTabs();
+          doSearch();
+          renderManage();
+          document.getElementById('search-meta').textContent = '薬品名を入力して検索してください（' + medicines.length + '件）';
+          setSyncStatus('ok');
+        }
+      } else {
+        // 初回：初期データをFirestoreに保存
+        medicines = JSON.parse(JSON.stringify(INITIAL_DATA));
+        saveMeds();
+      }
+      document.getElementById('loading-overlay').style.display = 'none';
+    }, function(err) {
+      console.error(err);
+      setSyncStatus('err');
+      document.getElementById('loading-overlay').style.display = 'none';
+      toast('⚠️ 接続エラー。オフラインで動作します');
+      // ローカルストレージからフォールバック
+      var s = localStorage.getItem('med_shelf_data');
+      medicines = s ? JSON.parse(s) : JSON.parse(JSON.stringify(INITIAL_DATA));
+      buildShelfTabs(); doSearch(); renderManage();
+    });
+  } catch(e) {
+    console.error(e);
+    document.getElementById('loading-overlay').style.display = 'none';
+    setSyncStatus('err');
+  }
 }
-function init() {
-  var s = localStorage.getItem(STORAGE_KEY);
-  medicines = s ? JSON.parse(s) : JSON.parse(JSON.stringify(INITIAL_DATA));
-  buildShelfTabs();
-  updateSelCount();
-  renderManage();
-  document.getElementById('search-meta').textContent = '薬品名を入力して検索してください（' + medicines.length + '件）';
+
+async function saveMeds() {
+  isSaving = true;
+  setSyncStatus('ing');
+  try {
+    await setDoc(DATA_DOC, { list: medicines, updatedAt: new Date().toISOString() });
+    localStorage.setItem('med_shelf_data', JSON.stringify(medicines));
+    setSyncStatus('ok');
+  } catch(e) {
+    console.error(e);
+    setSyncStatus('err');
+    toast('⚠️ クラウド保存に失敗しました');
+    localStorage.setItem('med_shelf_data', JSON.stringify(medicines));
+  }
+  isSaving = false;
 }
-function saveMeds() { localStorage.setItem(STORAGE_KEY, JSON.stringify(medicines)); }
 
 var toastTimer;
 function toast(msg) {
@@ -341,18 +386,15 @@ function toast(msg) {
   toastTimer = setTimeout(function() { el.classList.remove('show'); }, 2200);
 }
 
-/* ===== メインタブ切替 ===== */
-function switchMainTab(name, btn) {
-  currentMainTab = name;
-  document.getElementById('tab-search').style.display   = name==='search'   ? '' : 'none';
-  document.getElementById('tab-manage').style.display   = name==='manage'   ? '' : 'none';
+window.switchMainTab = function(name, btn) {
+  document.getElementById('tab-search').style.display = name==='search' ? '' : 'none';
+  document.getElementById('tab-manage').style.display = name==='manage' ? '' : 'none';
   document.getElementById('shelf-tabs-row').style.display = name==='search' ? '' : 'none';
-  document.querySelectorAll('.tab-btn').forEach(function(b) { b.classList.remove('active','active-sel'); });
-  btn.classList.add(name==='selected' ? 'active-sel' : 'active');
+  document.querySelectorAll('.tab-btn').forEach(function(b) { b.classList.remove('active'); });
+  btn.classList.add('active');
   if (name==='manage') renderManage();
-}
+};
 
-/* ===== 棚タブ ===== */
 function buildShelfTabs() {
   var shelfSet = {};
   medicines.forEach(function(m) { if(m.shelf) shelfSet[m.shelf]=true; });
@@ -369,8 +411,7 @@ function buildShelfTabs() {
   });
 }
 
-/* ===== 検索 ===== */
-function doSearch() {
+window.doSearch = function() {
   var q = norm(document.getElementById('search-input').value.trim());
   var list = medicines;
   if (currentShelf !== 'ALL') list = list.filter(function(m) { return m.shelf===currentShelf; });
@@ -390,7 +431,7 @@ function doSearch() {
   list = scored.map(function(s){return s.med;});
   document.getElementById('search-meta').textContent = list.length + '件ヒット / ' + selected.length + '件選択中';
   renderMedList(list);
-}
+};
 
 function renderMedList(list) {
   var el = document.getElementById('med-list');
@@ -417,7 +458,6 @@ function renderMedList(list) {
   });
 }
 
-/* ===== 選択トグル ===== */
 function toggleSelect(med) {
   var idx = selected.findIndex(function(s){return s.id===med.id;});
   if (idx>=0) {
@@ -443,23 +483,18 @@ function updateSelCount() {
   document.getElementById('sel-panel').style.display = n > 0 ? '' : 'none';
 }
 
-function removeSel(id) {
+window.removeSel = function(id) {
   selected = selected.filter(function(s){return s.id!==id;});
-  updateSelCount();
-  doSearch();
-  renderSelTab();
-}
-function clearAll() {
+  updateSelCount(); doSearch(); renderSelTab();
+};
+
+window.clearAll = function() {
   if (!selected.length) return;
   if (!confirm('選択中の薬品をすべてクリアしますか？')) return;
-  selected=[];
-  updateSelCount();
-  doSearch();
-  renderSelTab();
+  selected=[]; updateSelCount(); doSearch(); renderSelTab();
   toast('すべてクリアしました');
-}
+};
 
-/* ===== 選択中タブ描画 ===== */
 function renderSelTab() {
   var list = document.getElementById('sel-list');
   document.getElementById('sel-count-badge').textContent = selected.length + '件';
@@ -480,7 +515,6 @@ function renderSelTab() {
   });
 }
 
-/* ===== データ管理 ===== */
 function renderManage() {
   var tbody = document.getElementById('manage-tbody');
   var mq = document.getElementById('manage-search');
@@ -494,7 +528,7 @@ function renderManage() {
   medicines.forEach(function(m){if(m.shelf)shelfSet[m.shelf]=true;});
   var shelfOptions=Object.keys(shelfSet).sort();
 
-  // ★修正箇所：追加フォームの棚セレクトを毎回リセットして再構築
+  // 棚セレクトを毎回再構築
   var addSel = document.getElementById('add-shelf-sel');
   if (addSel) {
     var currentVal = addSel.value;
@@ -503,7 +537,6 @@ function renderManage() {
       var opt=document.createElement('option'); opt.value=s; opt.textContent=s; addSel.appendChild(opt);
     });
     var other=document.createElement('option'); other.value='__custom__'; other.textContent='その他（直接入力）'; addSel.appendChild(other);
-    // 選択中の値を復元（フォームが開いている場合）
     if (currentVal) addSel.value = currentVal;
   }
 
@@ -532,9 +565,10 @@ function renderManage() {
   });
   updateBulkFromSelect();
 }
-function startEdit(id){editingId=id;renderManage();}
-function cancelEdit(){editingId=null;renderManage();}
-function saveEdit(id){
+
+window.startEdit = function(id){editingId=id;renderManage();};
+window.cancelEdit = function(){editingId=null;renderManage();};
+window.saveEdit = function(id){
   var med=null;
   for(var i=0;i<medicines.length;i++){if(medicines[i].id===id){med=medicines[i];break;}}
   if(!med)return;
@@ -547,15 +581,17 @@ function saveEdit(id){
   med.note=document.getElementById('e-note').value.trim();
   editingId=null;
   saveMeds();buildShelfTabs();doSearch();renderManage();
-  toast('更新しました');
-}
-function deleteMed(id){
+  toast('✅ 更新しました（全デバイスに同期中）');
+};
+
+window.deleteMed = function(id){
   if(!confirm('削除しますか？'))return;
   medicines=medicines.filter(function(m){return m.id!==id;});
   saveMeds();buildShelfTabs();doSearch();renderManage();
   toast('削除しました');
-}
-function toggleAddForm() {
+};
+
+window.toggleAddForm = function() {
   var panel = document.getElementById('add-form-panel');
   var btn = document.getElementById('add-form-toggle-btn');
   var isOpen = panel.style.display !== 'none';
@@ -570,13 +606,15 @@ function toggleAddForm() {
     document.getElementById('add-shelf-custom').value='';
     setTimeout(function(){document.getElementById('add-general').focus();},100);
   }
-}
-function toggleAddShelfCustom() {
+};
+
+window.toggleAddShelfCustom = function() {
   var sel = document.getElementById('add-shelf-sel');
   var custom = document.getElementById('add-shelf-custom');
   custom.style.display = sel.value==='__custom__' ? '' : 'none';
-}
-function submitAddForm() {
+};
+
+window.submitAddForm = function() {
   var general = document.getElementById('add-general').value.trim();
   var shelfSel = document.getElementById('add-shelf-sel').value;
   var shelfCustom = document.getElementById('add-shelf-custom').value.trim();
@@ -595,14 +633,16 @@ function submitAddForm() {
   saveMeds(); buildShelfTabs(); renderManage();
   toggleAddForm();
   toast('✅ 追加しました：' + general);
-}
+};
+
 function updateBulkFromSelect(){
   var sel=document.getElementById('bulk-from');
   var shelfSet={};
   medicines.forEach(function(m){if(m.shelf)shelfSet[m.shelf]=true;});
   sel.innerHTML='<option value="">選択してください</option>'+Object.keys(shelfSet).sort().map(function(s){return '<option value="'+esc(s)+'">'+esc(s)+'</option>';}).join('');
 }
-function doBulkChange(){
+
+window.doBulkChange = function(){
   var from=document.getElementById('bulk-from').value;
   var to=document.getElementById('bulk-to').value.trim();
   if(!from){toast('変更元の棚種類を選択してください');return;}
@@ -612,9 +652,10 @@ function doBulkChange(){
   medicines.forEach(function(m){if(m.shelf===from){m.shelf=to;count++;}});
   saveMeds();buildShelfTabs();doSearch();renderManage();
   document.getElementById('bulk-result').textContent=count+'件を変更しました';
-  toast(count+'件を「'+to+'」に変更しました');
-}
-function importCSV(input){
+  toast(count+'件を「'+to+'」に変更しました（全デバイスに同期中）');
+};
+
+window.importCSV = function(input){
   var file=input.files[0];if(!file)return;
   var reader=new FileReader();
   reader.onload=function(e){
@@ -640,7 +681,8 @@ function importCSV(input){
     input.value='';
   };
   reader.readAsText(file,'UTF-8');
-}
+};
+
 function parseCSVLine(line){
   var result=[],cur='',inQ=false;
   for(var i=0;i<line.length;i++){
@@ -650,7 +692,8 @@ function parseCSVLine(line){
   }
   result.push(cur);return result;
 }
-function exportCurrentCSV(){
+
+window.exportCurrentCSV = function(){
   var BOM='\uFEFF';
   var csv=BOM+'一般名称,後発/ジェネリック,先発,棚の種類,Note\n';
   medicines.forEach(function(m){csv+=[m.general,m.generic,m.brand,m.shelf,m.note].map(function(v){return '"'+String(v||'').replace(/"/g,'""')+'"';}).join(',')+'\n';});
@@ -658,13 +701,15 @@ function exportCurrentCSV(){
   var a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='医薬品データ.csv';
   document.body.appendChild(a);a.click();document.body.removeChild(a);
   toast('CSVを出力しました');
-}
-function resetToDefault(){
+};
+
+window.resetToDefault = function(){
   if(!confirm('初期データに戻します。よろしいですか？'))return;
   medicines=JSON.parse(JSON.stringify(INITIAL_DATA));
   saveMeds();buildShelfTabs();doSearch();renderManage();
   toast('初期データに戻しました');
-}
+};
+
 function esc(str){
   return String(str||'').replace(/[&<>"']/g,function(s){return{'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[s];});
 }
