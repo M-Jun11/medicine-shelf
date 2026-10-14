@@ -8,10 +8,12 @@
 <script type="module">
 import{initializeApp}from"https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
 import{getFirestore,doc,setDoc,onSnapshot}from"https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
-import{getAuth,GoogleAuthProvider,signInWithPopup,signOut,onAuthStateChanged}from"https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
+import{getAuth,initializeAuth,inMemoryPersistence,GoogleAuthProvider,signInWithPopup,signInWithEmailAndPassword,signOut,onAuthStateChanged}from"https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
 const _app=initializeApp({apiKey:"AIzaSyDF06cAdw0mQ1yYAxA0AuSJCc4GrtNk4HY",authDomain:"med-shelf-bc28a.firebaseapp.com",projectId:"med-shelf-bc28a",storageBucket:"med-shelf-bc28a.firebasestorage.app",messagingSenderId:"738332731936",appId:"1:738332731936:web:bab656b84c81adb1fe6a45"});
 const _db=getFirestore(_app);const _ref=doc(_db,"medshelf","medicines");
-// Google ログイン（2026-10）：読み書きできるのは Firestore のルールで許可したアカウントだけ。許可の一覧はルールの側で管理する
+// ログイン（2026-10）：画面ではパスワードだけを入れる。中身は Firebase Authentication の共有アカウント（メールは固定、パスワードはコードに書かない）。
+// 読み書きできるのは Firestore のルールで許可したアカウントだけ（共有アカウントの uid と、許可した Google アカウント）。ログイン状態はこの端末に残る（毎回入れなくてよい）
+const SHARED_EMAIL='shelf@med-shelf-bc28a.local';
 const _auth=getAuth(_app);const _provider=new GoogleAuthProvider();_provider.setCustomParameters({prompt:'select_account'});
 // 保存：失敗したら画面に出す（黙って捨てない）。クラウドから読み込めるまでは保存しない（初期データで上書きしないため）
 window._fbLoaded=false;
@@ -24,8 +26,13 @@ window._fbSave=async d=>{
 window._fbLoad=(cb,onErr)=>onSnapshot(_ref,s=>{window._fbLoaded=true;cb(s.exists()&&s.data().list?s.data().list:null);},
   e=>{onErr&&onErr(e&&e.code==='permission-denied'?'このアカウントでは使えません（許可されていません）':(e&&e.message)||String(e));});
 window._fbSignIn=async()=>{try{await signInWithPopup(_auth,_provider);}catch(e){window._onAuthError&&window._onAuthError(e&&e.code==='auth/popup-closed-by-user'?'':'ログインできませんでした（'+((e&&e.code)||e)+'）');}};
+window._fbSignInPw=async pw=>{try{await signInWithEmailAndPassword(_auth,SHARED_EMAIL,pw);}catch(e){var c=e&&e.code;window._onAuthError&&window._onAuthError(c==='auth/invalid-credential'||c==='auth/wrong-password'||c==='auth/invalid-login-credentials'?'パスワードが違います':c==='auth/too-many-requests'?'失敗が続いたため、しばらく入力できません。時間をおいてください':'ログインできませんでした（'+(c||e)+'）');}};
+// 共有パスワードの照合だけ（初期化の確認用）：別のアプリの入れ物で試しにログインして、すぐ出る。今のログイン状態には触らない
+let _chkAuth=null;
+window._fbCheckPw=async pw=>{if(!_chkAuth){_chkAuth=initializeAuth(initializeApp(_app.options,'pwcheck'),{persistence:inMemoryPersistence});}
+  try{await signInWithEmailAndPassword(_chkAuth,SHARED_EMAIL,pw);await signOut(_chkAuth);return 'ok';}catch(e){var c=e&&e.code;return c==='auth/invalid-credential'||c==='auth/wrong-password'||c==='auth/invalid-login-credentials'?'wrong':c==='auth/too-many-requests'?'locked':'error';}};
 window._fbSignOut=()=>signOut(_auth);
-onAuthStateChanged(_auth,u=>{if(u){window._onSignedIn&&window._onSignedIn(u.email||'');}else{window._onSignedOut&&window._onSignedOut();}});
+onAuthStateChanged(_auth,u=>{if(u){window._onSignedIn&&window._onSignedIn(u.email===SHARED_EMAIL?'':(u.email||''));}else{window._onSignedOut&&window._onSignedOut();}});
 </script>
 
 <style>
@@ -138,9 +145,11 @@ input,select,button{font-family:inherit;}
   <div class="auth-box">
     <div class="auth-icon">&#128138;</div>
     <h2 class="auth-title">医薬品棚管理システム</h2>
-    <p class="auth-sub">許可された Google アカウントでログインしてください</p>
+    <p class="auth-sub">パスワードを入力してください</p>
+    <input type="password" id="pw-input" class="auth-input" placeholder="パスワード" inputmode="numeric" autocomplete="current-password" onkeydown="if(event.key==='Enter')doPwLogin()">
     <div id="auth-error" class="auth-error"></div>
-    <button class="auth-btn" onclick="doLogin()">Google でログイン</button>
+    <button class="auth-btn" onclick="doPwLogin()">ログイン</button>
+    <div style="margin-top:18px;"><a href="#" onclick="doLogin();return false;" style="color:rgba(255,255,255,.45);font-size:12px;">Google アカウントでログイン（管理者用）</a></div>
   </div>
 </div>
 <div id="main-screen">
@@ -267,13 +276,20 @@ function toKatakana(s) {
 }
 function norm(s) { return toKatakana(String(s||'').normalize('NFKC')); }
 
-// ログイン：Google（Firebase Authentication）。使えるかどうかは Firestore のルールが決める（許可されていないアカウントは読み込みで拒否される）
+// ログイン：共有パスワード（Firebase Authentication のメール/パスワード）か Google。使えるかどうかは Firestore のルールが決める（許可されていないアカウントは読み込みで拒否される）
 var _unsubscribe = null;
 function showAuthError(msg) { document.getElementById('auth-error').textContent = msg || ''; }
 function doLogin() {
   showAuthError('');
   if (!window._fbSignIn) { showAuthError('読み込み中です。少し待ってからもう一度押してください'); return; }
   window._fbSignIn();
+}
+function doPwLogin() {
+  showAuthError('');
+  var el = document.getElementById('pw-input'); var pw = (el.value || '').trim();
+  if (!pw) { showAuthError('パスワードを入力してください'); return; }
+  if (!window._fbSignInPw) { showAuthError('読み込み中です。少し待ってからもう一度押してください'); return; }
+  window._fbSignInPw(pw).then(function(){ el.value = ''; });
 }
 function doLogout() { if (window._fbSignOut) window._fbSignOut(); }
 window._onAuthError = showAuthError;
@@ -629,10 +645,11 @@ function exportCurrentCSV(){
   document.body.appendChild(a);a.click();document.body.removeChild(a);
   toast('CSVを出力しました');
 }
-function resetToDefault(){
-  var pw=prompt('初期化するには「初期化」と入力してください：');
+async function resetToDefault(){
+  var pw=prompt('初期化するにはパスワードを入力してください：');
   if(pw===null)return;
-  if((pw||'').trim()!=='初期化'){toast('⚠️ 入力が違います');return;}
+  var r=window._fbCheckPw?await window._fbCheckPw((pw||'').trim()):'error';
+  if(r!=='ok'){toast(r==='wrong'?'⚠️ パスワードが違います':r==='locked'?'⚠️ 失敗が続いたため、しばらく入力できません':'⚠️ パスワードを確認できませんでした');return;}
   if(!confirm('初期データ（1065件）に戻します。現在のデータはすべて失われます。本当によろしいですか？'))return;
   medicines=JSON.parse(JSON.stringify(INITIAL_DATA));
   saveMeds();buildShelfTabs();doSearch();renderManage();
