@@ -8,7 +8,7 @@
 <script type="module">
 import{initializeApp}from"https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
 import{getFirestore,doc,setDoc,onSnapshot}from"https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
-import{getAuth,GoogleAuthProvider,signInWithPopup,signInWithEmailAndPassword,signOut,onAuthStateChanged}from"https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
+import{getAuth,initializeAuth,inMemoryPersistence,GoogleAuthProvider,signInWithPopup,signInWithEmailAndPassword,signOut,onAuthStateChanged}from"https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
 const _app=initializeApp({apiKey:"AIzaSyDF06cAdw0mQ1yYAxA0AuSJCc4GrtNk4HY",authDomain:"med-shelf-bc28a.firebaseapp.com",projectId:"med-shelf-bc28a",storageBucket:"med-shelf-bc28a.firebasestorage.app",messagingSenderId:"738332731936",appId:"1:738332731936:web:bab656b84c81adb1fe6a45"});
 const _db=getFirestore(_app);const _ref=doc(_db,"medshelf","medicines");
 // ログイン（2026-10）：画面ではパスワードだけを入れる。中身は Firebase Authentication の共有アカウント（メールは固定、パスワードはコードに書かない）。
@@ -27,6 +27,10 @@ window._fbLoad=(cb,onErr)=>onSnapshot(_ref,s=>{window._fbLoaded=true;cb(s.exists
   e=>{onErr&&onErr(e&&e.code==='permission-denied'?'このアカウントでは使えません（許可されていません）':(e&&e.message)||String(e));});
 window._fbSignIn=async()=>{try{await signInWithPopup(_auth,_provider);}catch(e){window._onAuthError&&window._onAuthError(e&&e.code==='auth/popup-closed-by-user'?'':'ログインできませんでした（'+((e&&e.code)||e)+'）');}};
 window._fbSignInPw=async pw=>{try{await signInWithEmailAndPassword(_auth,SHARED_EMAIL,pw);}catch(e){var c=e&&e.code;window._onAuthError&&window._onAuthError(c==='auth/invalid-credential'||c==='auth/wrong-password'||c==='auth/invalid-login-credentials'?'パスワードが違います':c==='auth/too-many-requests'?'失敗が続いたため、しばらく入力できません。時間をおいてください':'ログインできませんでした（'+(c||e)+'）');}};
+// 共有パスワードの照合だけ（初期化の確認用）：別のアプリの入れ物で試しにログインして、すぐ出る。今のログイン状態には触らない
+let _chkAuth=null;
+window._fbCheckPw=async pw=>{if(!_chkAuth){_chkAuth=initializeAuth(initializeApp(_app.options,'pwcheck'),{persistence:inMemoryPersistence});}
+  try{await signInWithEmailAndPassword(_chkAuth,SHARED_EMAIL,pw);await signOut(_chkAuth);return 'ok';}catch(e){var c=e&&e.code;return c==='auth/invalid-credential'||c==='auth/wrong-password'||c==='auth/invalid-login-credentials'?'wrong':c==='auth/too-many-requests'?'locked':'error';}};
 window._fbSignOut=()=>signOut(_auth);
 onAuthStateChanged(_auth,u=>{if(u){window._onSignedIn&&window._onSignedIn(u.email===SHARED_EMAIL?'':(u.email||''));}else{window._onSignedOut&&window._onSignedOut();}});
 </script>
@@ -641,10 +645,11 @@ function exportCurrentCSV(){
   document.body.appendChild(a);a.click();document.body.removeChild(a);
   toast('CSVを出力しました');
 }
-function resetToDefault(){
-  var pw=prompt('初期化するには「初期化」と入力してください：');
+async function resetToDefault(){
+  var pw=prompt('初期化するにはパスワードを入力してください：');
   if(pw===null)return;
-  if((pw||'').trim()!=='初期化'){toast('⚠️ 入力が違います');return;}
+  var r=window._fbCheckPw?await window._fbCheckPw((pw||'').trim()):'error';
+  if(r!=='ok'){toast(r==='wrong'?'⚠️ パスワードが違います':r==='locked'?'⚠️ 失敗が続いたため、しばらく入力できません':'⚠️ パスワードを確認できませんでした');return;}
   if(!confirm('初期データ（1065件）に戻します。現在のデータはすべて失われます。本当によろしいですか？'))return;
   medicines=JSON.parse(JSON.stringify(INITIAL_DATA));
   saveMeds();buildShelfTabs();doSearch();renderManage();
