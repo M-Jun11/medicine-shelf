@@ -154,6 +154,64 @@ input,select,button{font-family:inherit;}
   .med-list{display:grid;grid-template-columns:repeat(auto-fill,minmax(320px,1fr));}
   .sel-list{display:grid;grid-template-columns:repeat(auto-fill,minmax(340px,1fr));}
 }
+/* ===== 棚シール（2026-11-14） 元：label_先発ver2.0 / label_後発ver2.0 ===== */
+#lbl-view{display:none;position:fixed;inset:0;z-index:200;background:#f8fafc;overflow:auto;}
+body.lbl-open #lbl-view{display:block;}
+body.lbl-open{overflow:hidden;}
+.lbl-ctrl{max-width:900px;margin:0 auto;padding:16px;font-family:sans-serif;}
+.lbl-ctrl h2{font-size:18px;color:#0f172a;margin-bottom:8px;}
+.lbl-ctrl .lbl-hint{font-size:13px;color:#475569;margin-bottom:10px;line-height:1.6;}
+.lbl-bar{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin-bottom:12px;}
+.lbl-bar button{padding:10px 14px;border:none;border-radius:8px;font-size:14px;font-weight:700;cursor:pointer;}
+.lbl-btn-print{background:#059669;color:#fff;}
+.lbl-btn-close{background:#e2e8f0;color:#334155;}
+.lbl-btn-sub{background:#fff;color:#0077b6;border:1px solid #0077b6 !important;}
+.lbl-rows{background:#fff;border-radius:10px;box-shadow:0 1px 6px rgba(0,0,0,.06);margin-bottom:12px;}
+.lbl-row{display:flex;flex-wrap:wrap;gap:6px 10px;align-items:center;padding:10px 12px;border-bottom:1px solid #f1f5f9;font-size:13px;}
+.lbl-row:last-child{border-bottom:none;}
+.lbl-row .lbl-name{flex:1 1 220px;min-width:0;word-break:break-all;}
+.lbl-row .lbl-name small{display:block;color:#64748b;}
+.lbl-row select,.lbl-row input{padding:6px 8px;border:1px solid #cbd5e1;border-radius:6px;font-size:13px;}
+.lbl-row input.lbl-kubun{width:9em;}
+.lbl-row button{padding:6px 10px;border:1px solid #fecaca;background:#fff;color:#dc2626;border-radius:6px;cursor:pointer;}
+.lbl-recent{background:#fff;border-radius:10px;padding:10px 12px;margin-bottom:12px;box-shadow:0 1px 6px rgba(0,0,0,.06);font-size:13px;}
+.lbl-recent summary{cursor:pointer;font-weight:700;color:#0077b6;}
+.lbl-recent-list{margin-top:8px;max-height:240px;overflow:auto;}
+.lbl-recent-list label{display:flex;gap:8px;align-items:flex-start;padding:4px 0;border-bottom:1px dashed #e2e8f0;}
+.lbl-empty{padding:14px;color:#64748b;font-size:13px;}
+/* 印刷の面（元の HTML と同じ寸法・文字の大きさ） */
+.lbl-sheet{width:176mm;margin:0 auto 24px;display:flex;flex-wrap:wrap;justify-content:flex-start;align-content:flex-start;background:#fff;font-family:"Helvetica Neue",Arial,"Hiragino Kaku Gothic ProN","Hiragino Sans",Meiryo,sans-serif;}
+.lbl{box-sizing:border-box;width:57mm;height:42mm;border:1px dashed #888;display:flex;flex-direction:column;justify-content:center;align-items:center;text-align:center;page-break-inside:avoid;break-inside:avoid;overflow:hidden;position:relative;-webkit-print-color-adjust:exact;print-color-adjust:exact;}
+.lbl *{-webkit-print-color-adjust:exact;print-color-adjust:exact;}
+.lbl.lbl-blank{border-color:transparent;}
+/* 先発の型 */
+.lbl.t-brand{padding:2mm;}
+.t-brand .lb-top{font-weight:bold;color:#000;line-height:1.2;width:100%;margin-bottom:1.5mm;word-wrap:break-word;}
+.t-brand .lb-mid{font-size:8pt;color:#555;margin-bottom:1.5mm;width:95%;border-bottom:1px solid #ddd;padding-bottom:1px;}
+.t-brand .lb-bot{color:#d93025;line-height:1.1;width:100%;word-wrap:break-word;font-size:9pt;}
+.t-brand .size-xl{font-size:14pt;}
+.t-brand .size-l{font-size:12pt;}
+.t-brand .size-m{font-size:11pt;}
+.t-brand .size-s{font-size:10pt;}
+.t-brand .size-xs{font-size:8.5pt;}
+/* 後発の型 */
+.lbl.t-gen{padding:3mm;}
+.t-gen .lb-top{font-weight:900;line-height:1.2;margin-bottom:2mm;color:#000;width:100%;word-wrap:break-word;}
+.t-gen .size-l{font-size:14pt;}
+.t-gen .size-m{font-size:12pt;}
+.t-gen .size-s{font-size:10pt;}
+.t-gen .size-xs{font-size:9pt;}
+.t-gen .lb-mid{font-size:9pt;color:#333;margin-bottom:2mm;line-height:1.1;width:100%;border-bottom:1px solid #eee;padding-bottom:1px;}
+.t-gen .lb-bot{font-size:8pt;color:#007bff;line-height:1.1;width:100%;}
+@media screen and (max-width:700px){.lbl-sheet{zoom:.55;}}
+@page{size:A4;margin:10mm;}
+@media print{
+  body.lbl-open > *:not(#lbl-view){display:none !important;}
+  body.lbl-open{overflow:visible;background:#fff;}
+  body.lbl-open #lbl-view{position:static;overflow:visible;background:#fff;}
+  body.lbl-open .lbl-ctrl{display:none !important;}
+  body.lbl-open .lbl-sheet{margin:0 auto;}
+}
 </style>
 </head>
 <body>
@@ -206,7 +264,7 @@ input,select,button{font-family:inherit;}
     <div id="sel-panel" style="display:none;margin-top:20px;">
       <div style="background:#fff;border-radius:14px;padding:16px;box-shadow:0 2px 12px rgba(0,0,0,.06);margin-bottom:10px;display:flex;align-items:center;justify-content:space-between;">
         <div style="font-size:18px;font-weight:700;color:#059669;">&#9989; 選択中の薬品 <span id="sel-count-badge" style="background:#059669;color:#fff;padding:3px 12px;border-radius:14px;font-size:14px;margin-left:6px;">0件</span></div>
-        <button class="btn-clear-all" onclick="clearAll()">&#128465; 全クリア</button>
+        <div style="display:flex;gap:8px;flex-wrap:wrap;justify-content:flex-end;"><button class="btn-clear-all" style="background:#ecfdf5;color:#047857;border-color:#a7f3d0;" onclick="openLabels()">&#127991; 棚シールを印刷</button><button class="btn-clear-all" onclick="clearAll()">&#128465; 全クリア</button></div>
       </div>
       <div class="sel-list" id="sel-list"></div>
     </div>
@@ -231,6 +289,7 @@ input,select,button{font-family:inherit;}
       <div><div class="manage-title">医薬品データ管理</div><div style="font-size:12px;color:#94a3b8;margin-top:2px;" id="manage-count"></div></div>
       <div class="manage-actions">
         <label class="import-label">&#128229; CSVインポート<input type="file" accept=".csv" style="display:none;" onchange="importCSV(this)"/></label>
+        <button class="btn btn-gray btn-sm" onclick="openLabels()">&#127991; 棚シール</button>
         <button class="btn btn-green btn-sm" onclick="exportCurrentCSV()">&#128228; CSV出力</button>
         <button class="btn btn-gray btn-sm" onclick="resetToDefault()">&#128260; 初期データ</button>
       </div>
@@ -283,6 +342,28 @@ input,select,button{font-family:inherit;}
       </table>
     </div>
   </div>
+</div>
+<div id="lbl-view" aria-label="棚シールの印刷">
+  <div class="lbl-ctrl">
+    <h2>&#127991; 棚シールの印刷（A4・57×42mm・3列）</h2>
+    <div class="lbl-hint">1枚ずつ「先発の型（先発品が入っている棚）」か「後発の型（後発品が入っている棚）」を選びます。区分は名前の後ろに（劇薬）のように付きます（空にすると付きません）。<br>印刷の画面では、用紙を A4・倍率 100%（「ページに合わせる」を切る）にしてください。</div>
+    <div class="lbl-bar">
+      <button type="button" class="lbl-btn-print" onclick="printLabels()">&#128424; 印刷する</button>
+      <button type="button" class="lbl-btn-sub" onclick="setAllLabelType('brand')">全部を先発の型に</button>
+      <button type="button" class="lbl-btn-sub" onclick="setAllLabelType('gen')">全部を後発の型に</button>
+      <label style="font-size:13px;color:#334155;">最初の空き位置 <input type="number" id="lbl-skip" min="1" max="18" value="1" style="width:4em;padding:6px;border:1px solid #cbd5e1;border-radius:6px;" oninput="renderLabelSheet()"/> 枚目から</label>
+      <button type="button" class="lbl-btn-close" onclick="closeLabels()">&#10005; 閉じる</button>
+    </div>
+    <details class="lbl-recent" id="lbl-recent">
+      <summary>最近足した薬から選ぶ</summary>
+      <div style="margin-top:8px;">期間 <select id="lbl-recent-days" onchange="renderLabelRecent()"><option value="7">7日</option><option value="30" selected>30日</option><option value="90">90日</option><option value="0">すべて</option></select>
+        <button type="button" class="lbl-btn-sub" style="padding:4px 10px;border-radius:6px;cursor:pointer;" onclick="addCheckedRecent()">チェックした薬をシールに足す</button></div>
+      <div class="lbl-recent-list" id="lbl-recent-list"></div>
+    </details>
+    <div class="lbl-rows" id="lbl-rows"></div>
+    <div style="font-size:13px;color:#475569;margin-bottom:6px;">見本（このとおり印刷されます）</div>
+  </div>
+  <div class="lbl-sheet" id="lbl-sheet"></div>
 </div>
 <div class="toast" id="toast"></div>
 <script>
@@ -627,7 +708,8 @@ function submitAddForm() {
     generic: document.getElementById('add-generic').value.trim(),
     brand: document.getElementById('add-brand').value.trim(),
     shelf: shelf,
-    note: document.getElementById('add-note').value.trim()
+    note: document.getElementById('add-note').value.trim(),
+    addedAt: Date.now()
   };
   medicines.push(newMed);
   saveMeds(); buildShelfTabs(); renderManage();
@@ -672,7 +754,7 @@ function importCSV(input){
       if(!cells.length)continue;
       imported.push({id:baseId++,general:cells[colMap['一般名称']]||'',generic:colMap['後発/ジェネリック']!=null?(cells[colMap['後発/ジェネリック']]||''):'',brand:colMap['先発']!=null?(cells[colMap['先発']]||''):'',shelf:colMap['棚の種類']!=null?(cells[colMap['棚の種類']]||''):'',note:colMap['Note']!=null?(cells[colMap['Note']]||''):''});
     }
-    if(!confirm(imported.length+'件をインポートします。OK=上書き / キャンセル=追加')){medicines=medicines.concat(imported);}else{medicines=imported;}
+    if(!confirm(imported.length+'件をインポートします。OK=上書き / キャンセル=追加')){var _now=Date.now();imported.forEach(function(m){m.addedAt=_now;});medicines=medicines.concat(imported);}else{medicines=imported;}
     saveMeds();buildShelfTabs();doSearch();renderManage();
     toast(imported.length+'件をインポートしました');
     input.value='';
@@ -707,6 +789,123 @@ async function resetToDefault(){
   saveMeds();buildShelfTabs();doSearch();renderManage();
   toast('初期データに戻しました');
 }
+// ===== 棚シール（2026-11-14）=====
+// 薬の名前は textContent で入れる（innerHTML に入れない）。
+var labelItems = []; // {id, type:'brand'|'gen', kubun}
+function _blankish(v){ v = String(v||'').trim(); return (v===''||v==='ー'||v==='-'||v==='－'||v==='なし'||/^((後発|先発)品?|取り?扱い?)なし$/.test(v)) ? '' : v; }
+function _labelMed(id){ for(var i=0;i<medicines.length;i++){ if(medicines[i].id===id) return medicines[i]; } for(var j=0;j<selected.length;j++){ if(selected[j].id===id) return selected[j]; } return null; }
+// 区分の初期値：棚の種類に「劇」「毒」があるときだけ棚の種類を付ける（「通常」や「漢方棚２段」などの置き場所は付けない）。画面で直せる。
+function defaultKubun(m){ var sh = _blankish(m && m.shelf); return /劇|毒/.test(sh) ? sh : ''; }
+// 型の初期値：後発品名がなく先発品名だけなら先発の型、それ以外は後発の型。
+function defaultLabelType(m){ return (!_blankish(m.generic) && _blankish(m.brand)) ? 'brand' : 'gen'; }
+function addLabelItem(m){
+  if (!m) return;
+  if (labelItems.some(function(x){ return x.id===m.id; })) return;
+  labelItems.push({ id:m.id, type:defaultLabelType(m), kubun:defaultKubun(m) });
+}
+function openLabels(){
+  selected.forEach(function(m){ addLabelItem(m); });
+  document.body.classList.add('lbl-open');
+  var rec = document.getElementById('lbl-recent');
+  if (rec) rec.open = labelItems.length === 0;
+  renderLabelRecent(); renderLabelRows(); renderLabelSheet();
+}
+function closeLabels(){ document.body.classList.remove('lbl-open'); }
+function printLabels(){
+  if (!labelItems.length) { toast('⚠️ シールにする薬がありません'); return; }
+  renderLabelSheet();
+  window.print();
+}
+function setAllLabelType(t){ labelItems.forEach(function(x){ x.type=t; }); renderLabelRows(); renderLabelSheet(); }
+function _el(tag, cls, text){ var e=document.createElement(tag); if(cls) e.className=cls; if(text!=null) e.textContent=text; return e; }
+function renderLabelRows(){
+  var box = document.getElementById('lbl-rows');
+  box.textContent = '';
+  if (!labelItems.length) { box.appendChild(_el('div','lbl-empty','まだありません。「選択中の薬品」で薬を選ぶか、上の「最近足した薬から選ぶ」から足してください。')); return; }
+  labelItems.forEach(function(it, idx){
+    var m = _labelMed(it.id);
+    var row = _el('div','lbl-row');
+    var name = _el('div','lbl-name');
+    name.appendChild(document.createTextNode((idx+1)+'. '+(_blankish(m&&m.generic)||_blankish(m&&m.brand)||(m&&m.general)||'（見つかりません）')));
+    name.appendChild(_el('small', null, '一般：'+((m&&m.general)||'')+'／先発：'+(_blankish(m&&m.brand)||'なし')+'／棚：'+((m&&m.shelf)||'')));
+    row.appendChild(name);
+    var sel = document.createElement('select');
+    sel.setAttribute('aria-label', '型');
+    [['gen','後発の型'],['brand','先発の型']].forEach(function(o){ var op=_el('option',null,o[1]); op.value=o[0]; if(it.type===o[0]) op.selected=true; sel.appendChild(op); });
+    sel.onchange = function(){ it.type = sel.value; renderLabelSheet(); };
+    row.appendChild(sel);
+    var kl = _el('label', null, '区分 ');
+    var ki = document.createElement('input');
+    ki.type='text'; ki.className='lbl-kubun'; ki.value=it.kubun; ki.placeholder='なし'; ki.maxLength=20;
+    ki.oninput = function(){ it.kubun = ki.value; renderLabelSheet(); };
+    kl.appendChild(ki); row.appendChild(kl);
+    var rm = _el('button', null, '外す');
+    rm.type='button';
+    rm.onclick = function(){ labelItems = labelItems.filter(function(x){ return x!==it; }); renderLabelRows(); renderLabelSheet(); renderLabelRecent(); };
+    row.appendChild(rm);
+    box.appendChild(row);
+  });
+}
+// 元の HTML と同じ文字数のしきい値
+function _sizeBrandTop(t){ var n=t.length; return n>30?'size-xs':n>20?'size-s':n>12?'size-m':n>8?'size-l':'size-xl'; }
+function _sizeBrandBot(t){ var n=t.length; return n>25?'size-xs':n>18?'size-s':'size-m'; }
+function _sizeGenTop(t){ var n=t.length; return n>35?'size-xs':n>25?'size-s':n>15?'size-m':'size-l'; }
+function buildLabel(it){
+  var m = _labelMed(it.id) || {};
+  var kubun = String(it.kubun||'').trim();
+  var general = _blankish(m.general), generic = _blankish(m.generic), brand = _blankish(m.brand);
+  var d = _el('div', 'lbl ' + (it.type==='brand' ? 't-brand' : 't-gen'));
+  if (it.type === 'brand') {
+    var top = (brand || '-') + (kubun ? '（'+kubun+'）' : '');
+    var bot = '後発：' + generic;
+    d.appendChild(_el('div', 'lb-top ' + _sizeBrandTop(top), top));
+    d.appendChild(_el('div', 'lb-mid', '【般】' + general));
+    d.appendChild(_el('div', 'lb-bot ' + _sizeBrandBot(bot), bot));
+  } else {
+    var topg = generic + (kubun ? '（'+kubun+'）' : '');
+    d.appendChild(_el('div', 'lb-top ' + _sizeGenTop(topg), topg));
+    d.appendChild(_el('div', 'lb-mid', '【般】' + general));
+    d.appendChild(_el('div', 'lb-bot', '（先発：' + brand + '）'));
+  }
+  return d;
+}
+function renderLabelSheet(){
+  var sheet = document.getElementById('lbl-sheet');
+  sheet.textContent = '';
+  var skip = parseInt((document.getElementById('lbl-skip')||{}).value, 10);
+  if (!(skip >= 1)) skip = 1; if (skip > 18) skip = 18;
+  for (var i=1; i<skip; i++) sheet.appendChild(_el('div','lbl lbl-blank'));
+  labelItems.forEach(function(it){ sheet.appendChild(buildLabel(it)); });
+}
+function renderLabelRecent(){
+  var list = document.getElementById('lbl-recent-list');
+  if (!list) return;
+  list.textContent = '';
+  var days = parseInt(document.getElementById('lbl-recent-days').value, 10) || 0;
+  var since = days ? Date.now() - days*86400000 : 0;
+  var rec = medicines.filter(function(m){ return typeof m.addedAt === 'number' && m.addedAt >= since; })
+    .sort(function(a,b){ return b.addedAt - a.addedAt; });
+  if (!rec.length) { list.appendChild(_el('div','lbl-empty','この期間に足した薬はありません（2026年11月14日より前に足した薬は日付がないため出ません）。')); return; }
+  rec.forEach(function(m){
+    var lab = document.createElement('label');
+    var cb = document.createElement('input'); cb.type='checkbox'; cb.value=String(m.id);
+    if (labelItems.some(function(x){ return x.id===m.id; })) { cb.checked=true; cb.disabled=true; }
+    lab.appendChild(cb);
+    var dt = new Date(m.addedAt);
+    lab.appendChild(_el('span', null, (dt.getMonth()+1)+'/'+dt.getDate()+'　'+(_blankish(m.generic)||_blankish(m.brand)||m.general||'')+'（棚：'+(m.shelf||'')+'）'));
+    list.appendChild(lab);
+  });
+}
+function addCheckedRecent(){
+  var n = 0;
+  document.querySelectorAll('#lbl-recent-list input[type=checkbox]:checked:not(:disabled)').forEach(function(cb){
+    var id = Number(cb.value); var m = _labelMed(id); if (m) { addLabelItem(m); n++; }
+  });
+  if (!n) { toast('⚠️ 薬にチェックを付けてください'); return; }
+  renderLabelRecent(); renderLabelRows(); renderLabelSheet();
+  toast('シールに' + n + '件足しました');
+}
+document.addEventListener('keydown', function(e){ if (e.key==='Escape' && document.body.classList.contains('lbl-open')) closeLabels(); });
 function esc(str){
   return String(str||'').replace(/[&<>"']/g,function(s){return{'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[s];});
 }
