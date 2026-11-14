@@ -794,8 +794,8 @@ async function resetToDefault(){
 var labelItems = []; // {id, type:'brand'|'gen', kubun}
 function _blankish(v){ v = String(v||'').trim(); return (v===''||v==='ー'||v==='-'||v==='－'||v==='なし'||/^((後発|先発)品?|取り?扱い?)なし$/.test(v)) ? '' : v; }
 function _labelMed(id){ for(var i=0;i<medicines.length;i++){ if(medicines[i].id===id) return medicines[i]; } for(var j=0;j<selected.length;j++){ if(selected[j].id===id) return selected[j]; } return null; }
-// 区分の初期値：棚の種類に「劇」「毒」があるときだけ棚の種類を付ける（「通常」や「漢方棚２段」などの置き場所は付けない）。画面で直せる。
-function defaultKubun(m){ var sh = _blankish(m && m.shelf); return /劇|毒/.test(sh) ? sh : ''; }
+// 区分の初期値：棚の種類に「毒」があれば「毒薬」、「劇」があれば「劇薬」（置き場所の名前は付けない）。画面で直せる。
+function defaultKubun(m){ var sh = _blankish(m && m.shelf); return /毒/.test(sh) ? '毒薬' : /劇/.test(sh) ? '劇薬' : ''; }
 // 型の初期値：後発品名がなく先発品名だけなら先発の型、それ以外は後発の型。
 function defaultLabelType(m){ return (!_blankish(m.generic) && _blankish(m.brand)) ? 'brand' : 'gen'; }
 function addLabelItem(m){
@@ -804,6 +804,7 @@ function addLabelItem(m){
   labelItems.push({ id:m.id, type:defaultLabelType(m), kubun:defaultKubun(m) });
 }
 function openLabels(){
+  labelItems = labelItems.filter(function(x){ return medicines.some(function(m){ return m.id===x.id; }); });
   selected.forEach(function(m){ addLabelItem(m); });
   document.body.classList.add('lbl-open');
   var rec = document.getElementById('lbl-recent');
