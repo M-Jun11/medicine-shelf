@@ -195,6 +195,11 @@ body.lbl-open{overflow:hidden;}
 .lbl-recent summary{cursor:pointer;font-weight:700;color:#0077b6;}
 .lbl-recent-list{margin-top:8px;max-height:240px;overflow:auto;}
 .lbl-recent-list label{display:flex;gap:8px;align-items:flex-start;padding:4px 0;border-bottom:1px dashed #e2e8f0;}
+.lbl-search{background:#fff;border-radius:10px;padding:10px 12px;margin-bottom:12px;box-shadow:0 1px 6px rgba(0,0,0,.06);font-size:13px;}
+.lbl-search input[type=search]{width:100%;padding:10px 12px;border:2px solid #cbd5e1;border-radius:8px;font-size:16px;outline:none;margin:6px 0;}
+.lbl-cand{display:flex;gap:8px;align-items:center;padding:6px 0;border-bottom:1px dashed #e2e8f0;}
+.lbl-cand label{flex:1;display:flex;gap:8px;align-items:flex-start;min-width:0;word-break:break-all;}
+.lbl-cand .lbl-edit,.lbl-row .lbl-edit{padding:6px 10px;border:1px solid #bae6fd;background:#e0f2fe;color:#0077b6;border-radius:6px;cursor:pointer;white-space:nowrap;font-size:13px;}
 .lbl-empty{padding:14px;color:#64748b;font-size:13px;}
 /* 印刷の面（元の HTML と同じ寸法・文字の大きさ） */
 .lbl-sheet{width:176mm;margin:0 auto 24px;display:flex;flex-wrap:wrap;justify-content:flex-start;align-content:flex-start;background:#fff;font-family:"Helvetica Neue",Arial,"Hiragino Kaku Gothic ProN","Hiragino Sans",Meiryo,sans-serif;}
@@ -370,6 +375,12 @@ body.lbl-open{overflow:hidden;}
       <label style="font-size:13px;color:#334155;">最初の空き位置 <input type="number" id="lbl-skip" min="1" max="18" value="1" style="width:4em;padding:6px;border:1px solid #cbd5e1;border-radius:6px;" oninput="renderLabelSheet()"/> 枚目から</label>
       <button type="button" class="lbl-btn-close" onclick="closeLabels()">&#10005; 閉じる</button>
     </div>
+    <div class="lbl-search" id="lbl-search-box">
+      <div style="font-weight:700;color:#0077b6;">薬を探す（名前・一般名・先発・棚、2文字から）</div>
+      <input type="search" id="lbl-search" placeholder="例：アムロ、冷蔵庫" oninput="renderLabelSearch()" autocomplete="off"/>
+      <div><button type="button" class="lbl-btn-sub" style="padding:6px 12px;border-radius:6px;cursor:pointer;" onclick="addCheckedSearch()">チェックした薬をシールに足す</button></div>
+      <div class="lbl-recent-list" id="lbl-search-list"></div>
+    </div>
     <details class="lbl-recent" id="lbl-recent">
       <summary>最近足した薬から選ぶ</summary>
       <div style="margin-top:8px;">期間 <select id="lbl-recent-days" onchange="renderLabelRecent()"><option value="7">7日</option><option value="30" selected>30日</option><option value="90">90日</option><option value="0">すべて</option></select>
@@ -392,6 +403,7 @@ var selected = [];
 var currentShelf = "ALL";
 var currentMainTab = "search";
 var editingId = null;
+var editingSheetForce = false;
 
 function toKatakana(s) {
   return String(s||'').replace(/[\u3041-\u3096]/g, function(c) {
@@ -642,7 +654,7 @@ function renderManage() {
     });
     var other=document.createElement('option'); other.value='__custom__'; other.textContent='その他（直接入力）'; addSel.appendChild(other);
   }
-  var narrow=isNarrow();
+  var narrow=isNarrow()||editingSheetForce;
   displayList.forEach(function(med,i){
     var tr=document.createElement('tr');
     if (editingId===med.id && !narrow) {
@@ -679,7 +691,7 @@ function openEditSheet(id, shelfOptions){
   var opts=shelfOptions.map(function(s){return '<option value="'+esc(s)+'"'+(s===med.shelf?' selected':'')+'>'+esc(s)+'</option>';}).join('')+'<option value="__custom__"'+(known?'':' selected')+'>その他（直接入力）</option>';
   var bg=document.createElement('div'); bg.id='edit-sheet-bg';
   bg.innerHTML='<div id="edit-sheet" role="dialog" aria-modal="true" aria-labelledby="es-title">'+
-    '<h3 id="es-title">薬品を編集</h3>'+
+    '<h3 id="es-title">薬品を編集</h3>'+(document.body.classList.contains('lbl-open')?'<div style="font-size:13px;color:#64748b;">保存すると薬品データが変わります（ほかの端末にも反映）。区分（劇薬など）はシールの行の「区分」で直します。</div>':'')+
     '<label for="e-general">一般名称</label><input type="text" id="e-general" value="'+esc(med.general)+'"/>'+
     '<label for="e-generic">後発/ジェネリック</label><input type="text" id="e-generic" value="'+esc(med.generic)+'"/>'+
     '<label for="e-brand">先発</label><input type="text" id="e-brand" value="'+esc(med.brand)+'"/>'+
@@ -694,7 +706,7 @@ function openEditSheet(id, shelfOptions){
   document.getElementById('es-save').onclick=function(){ saveEdit(id); };
   document.getElementById('es-cancel').onclick=function(){ cancelEdit(); };
 }
-function closeEditSheet(){ var bg=document.getElementById('edit-sheet-bg'); if(bg) bg.parentNode.removeChild(bg); document.body.classList.remove('es-open'); }
+function closeEditSheet(){ var bg=document.getElementById('edit-sheet-bg'); if(bg) bg.parentNode.removeChild(bg); document.body.classList.remove('es-open'); if(editingId===null) editingSheetForce=false; }
 function startEdit(id){editingId=id;renderManage();}
 function cancelEdit(){editingId=null;renderManage();}
 function saveEdit(id){
@@ -709,7 +721,7 @@ function saveEdit(id){
   med.shelf=sel.value==='__custom__'?custom.value.trim():sel.value;
   med.note=document.getElementById('e-note').value.trim();
   editingId=null;
-  saveMeds();buildShelfTabs();doSearch();renderManage();
+  saveMeds();buildShelfTabs();doSearch();renderManage();refreshLabelsAfterEdit();
   toast('更新しました');
 }
 function deleteMed(id){
@@ -873,7 +885,7 @@ function openLabels(){
   document.body.classList.add('lbl-open');
   var rec = document.getElementById('lbl-recent');
   if (rec) rec.open = labelItems.length === 0;
-  renderLabelRecent(); renderLabelRows(); renderLabelSheet();
+  renderLabelRecent(); renderLabelSearch(); renderLabelRows(); renderLabelSheet();
 }
 function closeLabels(){ document.body.classList.remove('lbl-open'); }
 function printLabels(){
@@ -904,6 +916,7 @@ function renderLabelRows(){
     ki.type='text'; ki.className='lbl-kubun'; ki.value=it.kubun; ki.placeholder='なし'; ki.maxLength=20;
     ki.oninput = function(){ it.kubun = ki.value; renderLabelSheet(); };
     kl.appendChild(ki); row.appendChild(kl);
+    if (m) { var ed = _el('button', 'lbl-edit', '直す'); ed.type='button'; ed.setAttribute('aria-label', 'この薬を直す'); ed.onclick = function(){ openMedEditor(m.id); }; row.appendChild(ed); }
     var rm = _el('button', null, '外す');
     rm.type='button';
     rm.onclick = function(){ labelItems = labelItems.filter(function(x){ return x!==it; }); renderLabelRows(); renderLabelSheet(); renderLabelRecent(); };
@@ -970,7 +983,43 @@ function addCheckedRecent(){
   renderLabelRecent(); renderLabelRows(); renderLabelSheet();
   toast('シールに' + n + '件足しました');
 }
-document.addEventListener('keydown', function(e){ if (e.key==='Escape' && document.body.classList.contains('lbl-open')) closeLabels(); });
+// 薬を探す（2026-11-21）：名前・一般名・先発・棚の部分一致、2文字から、30件まで
+var LBL_SEARCH_MAX = 30;
+function renderLabelSearch(){
+  var list = document.getElementById('lbl-search-list'); if (!list) return;
+  list.textContent = '';
+  var raw = (document.getElementById('lbl-search').value || '').trim();
+  if (raw.length < 2) { list.appendChild(_el('div','lbl-empty','2文字以上入れると候補が出ます。')); return; }
+  var q = norm(raw);
+  var hit = medicines.filter(function(m){ return [m.general, m.generic, m.brand, m.shelf].some(function(v){ return norm(v).indexOf(q) >= 0; }); });
+  if (!hit.length) { list.appendChild(_el('div','lbl-empty','見つかりませんでした。')); return; }
+  hit.slice(0, LBL_SEARCH_MAX).forEach(function(m){
+    var row = _el('div','lbl-cand');
+    var lab = document.createElement('label');
+    var cb = document.createElement('input'); cb.type='checkbox'; cb.value=String(m.id);
+    if (labelItems.some(function(x){ return x.id===m.id; })) { cb.checked=true; cb.disabled=true; }
+    lab.appendChild(cb);
+    var tx = _el('span', null, (_blankish(m.generic)||_blankish(m.brand)||m.general||''));
+    tx.appendChild(_el('small', null, '　一般：'+(m.general||'')+'／先発：'+(_blankish(m.brand)||'なし')+'／棚：'+(m.shelf||'')));
+    lab.appendChild(tx); row.appendChild(lab);
+    var ed = _el('button','lbl-edit','直す'); ed.type='button'; ed.setAttribute('aria-label','この薬を直す'); ed.onclick = function(){ openMedEditor(m.id); };
+    row.appendChild(ed); list.appendChild(row);
+  });
+  if (hit.length > LBL_SEARCH_MAX) list.appendChild(_el('div','lbl-empty','ほかに '+(hit.length-LBL_SEARCH_MAX)+' 件あります。もう少し詳しく入れてください。'));
+}
+function addCheckedSearch(){
+  var n = 0;
+  document.querySelectorAll('#lbl-search-list input[type=checkbox]:checked:not(:disabled)').forEach(function(cb){
+    var m = _labelMed(Number(cb.value)); if (m) { addLabelItem(m); n++; }
+  });
+  if (!n) { toast('⚠️ 薬にチェックを付けてください'); return; }
+  renderLabelSearch(); renderLabelRecent(); renderLabelRows(); renderLabelSheet();
+  toast('シールに' + n + '件足しました');
+}
+// 棚シールの画面から薬を直す：画面の幅にかかわらず編集シートで開く（保存はふだんの saveEdit と同じ）
+function openMedEditor(id){ editingSheetForce = true; editingId = id; renderManage(); }
+function refreshLabelsAfterEdit(){ if (!document.body.classList.contains('lbl-open')) return; labelItems = labelItems.filter(function(x){ return medicines.some(function(m){ return m.id===x.id; }); }); renderLabelSearch(); renderLabelRecent(); renderLabelRows(); renderLabelSheet(); }
+document.addEventListener('keydown', function(e){ if (e.key==='Escape' && document.body.classList.contains('lbl-open') && !document.getElementById('edit-sheet-bg')) closeLabels(); });
 function esc(str){
   return String(str||'').replace(/[&<>"']/g,function(s){return{'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[s];});
 }
