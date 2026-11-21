@@ -150,6 +150,23 @@ input,select,button{font-family:inherit;}
 .import-hint code{background:#e0f7ff;padding:1px 5px;border-radius:4px;font-family:monospace;}
 .toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%);background:#1e293b;color:#fff;padding:14px 28px;border-radius:14px;font-size:15px;font-weight:600;z-index:9999;box-shadow:0 8px 24px rgba(0,0,0,.3);opacity:0;transition:opacity .3s;pointer-events:none;}
 .toast.show{opacity:1;}
+/* スマホの編集（2026-11-21）：幅 768px 以下は行の中で編集せず、下からのシートで縦に並べる。iOS の拡大を防ぐため文字は16px */
+#edit-sheet-bg{position:fixed;inset:0;background:rgba(15,23,42,.45);z-index:300;display:flex;align-items:flex-end;justify-content:center;}
+#edit-sheet{background:#fff;width:100%;max-width:560px;max-height:92vh;overflow:auto;border-radius:18px 18px 0 0;padding:18px 16px calc(16px + env(safe-area-inset-bottom));box-shadow:0 -8px 30px rgba(0,0,0,.25);}
+#edit-sheet h3{font-size:17px;color:#0077b6;margin-bottom:12px;}
+#edit-sheet label{display:block;font-size:14px;color:#475569;font-weight:600;margin:12px 0 6px;}
+#edit-sheet input,#edit-sheet select{display:block;width:100%;padding:12px;border:2px solid #cbd5e1;border-radius:10px;font-size:16px;outline:none;background:#fff;color:#1e293b;}
+#edit-sheet input:focus,#edit-sheet select:focus{border-color:#00b4d8;}
+#edit-sheet .es-btns{display:flex;gap:10px;margin-top:18px;}
+#edit-sheet .es-btns button{flex:1;min-height:50px;border:none;border-radius:12px;font-size:17px;font-weight:700;cursor:pointer;}
+#edit-sheet .es-save{background:#0077b6;color:#fff;}
+#edit-sheet .es-cancel{background:#f1f5f9;color:#475569;border:1px solid #e2e8f0 !important;}
+body.es-open{overflow:hidden;}
+@media(max-width:768px){
+  #add-form-panel > div:nth-child(2){grid-template-columns:1fr !important;}
+  #add-form-panel input,#add-form-panel select,#manage-search{font-size:16px !important;}
+  #add-form-panel button{min-height:46px;font-size:16px !important;}
+}
 @media(min-width:600px){
   .med-list{display:grid;grid-template-columns:repeat(auto-fill,minmax(320px,1fr));}
   .sel-list{display:grid;grid-template-columns:repeat(auto-fill,minmax(340px,1fr));}
@@ -291,7 +308,6 @@ body.lbl-open{overflow:hidden;}
         <label class="import-label">&#128229; CSVインポート<input type="file" accept=".csv" style="display:none;" onchange="importCSV(this)"/></label>
         <button class="btn btn-gray btn-sm" onclick="openLabels()">&#127991; 棚シール</button>
         <button class="btn btn-green btn-sm" onclick="exportCurrentCSV()">&#128228; CSV出力</button>
-        <button class="btn btn-gray btn-sm" onclick="resetToDefault()">&#128260; 初期データ</button>
       </div>
     </div>
     <div class="card" style="padding:14px 16px;margin-bottom:10px;">
@@ -626,9 +642,10 @@ function renderManage() {
     });
     var other=document.createElement('option'); other.value='__custom__'; other.textContent='その他（直接入力）'; addSel.appendChild(other);
   }
+  var narrow=isNarrow();
   displayList.forEach(function(med,i){
     var tr=document.createElement('tr');
-    if (editingId===med.id) {
+    if (editingId===med.id && !narrow) {
       var opts=shelfOptions.map(function(s){return '<option value="'+esc(s)+'"'+(s===med.shelf?' selected':'')+'>'+esc(s)+'</option>';}).join('')+'<option value="__custom__">その他(入力)</option>';
       tr.innerHTML='<td>'+(i+1)+'</td>'+
         '<td><input class="edit-input" id="e-general" value="'+esc(med.general)+'"/></td>'+
@@ -649,8 +666,35 @@ function renderManage() {
     }
     tbody.appendChild(tr);
   });
+  if (narrow && editingId!==null) { openEditSheet(editingId, shelfOptions); } else { closeEditSheet(); }
   updateBulkFromSelect();
 }
+function isNarrow(){ return !!(window.matchMedia && window.matchMedia('(max-width:768px)').matches); }
+// 下からの編集シート。欄の id は行の中の編集と同じ（saveEdit をそのまま使う）
+function openEditSheet(id, shelfOptions){
+  var med=null; for(var i=0;i<medicines.length;i++){ if(medicines[i].id===id){ med=medicines[i]; break; } }
+  if(!med){ editingId=null; closeEditSheet(); return; }
+  if(document.getElementById('edit-sheet-bg')) return;
+  var known=shelfOptions.indexOf(med.shelf)>=0;
+  var opts=shelfOptions.map(function(s){return '<option value="'+esc(s)+'"'+(s===med.shelf?' selected':'')+'>'+esc(s)+'</option>';}).join('')+'<option value="__custom__"'+(known?'':' selected')+'>その他（直接入力）</option>';
+  var bg=document.createElement('div'); bg.id='edit-sheet-bg';
+  bg.innerHTML='<div id="edit-sheet" role="dialog" aria-modal="true" aria-labelledby="es-title">'+
+    '<h3 id="es-title">薬品を編集</h3>'+
+    '<label for="e-general">一般名称</label><input type="text" id="e-general" value="'+esc(med.general)+'"/>'+
+    '<label for="e-generic">後発/ジェネリック</label><input type="text" id="e-generic" value="'+esc(med.generic)+'"/>'+
+    '<label for="e-brand">先発</label><input type="text" id="e-brand" value="'+esc(med.brand)+'"/>'+
+    '<label for="e-shelf">棚の種類</label><select id="e-shelf">'+opts+'</select>'+
+    '<input type="text" id="e-shelf-custom" placeholder="新しい棚名" value="'+(known?'':esc(med.shelf||''))+'" style="margin-top:8px;'+(known?'display:none;':'')+'"/>'+
+    '<label for="e-note">Note</label><input type="text" id="e-note" value="'+esc(med.note)+'"/>'+
+    '<div class="es-btns"><button type="button" class="es-cancel" id="es-cancel">やめる</button><button type="button" class="es-save" id="es-save">保存</button></div>'+
+    '</div>';
+  document.body.appendChild(bg); document.body.classList.add('es-open');
+  var sel=document.getElementById('e-shelf');
+  sel.onchange=function(){ document.getElementById('e-shelf-custom').style.display=sel.value==='__custom__'?'':'none'; };
+  document.getElementById('es-save').onclick=function(){ saveEdit(id); };
+  document.getElementById('es-cancel').onclick=function(){ cancelEdit(); };
+}
+function closeEditSheet(){ var bg=document.getElementById('edit-sheet-bg'); if(bg) bg.parentNode.removeChild(bg); document.body.classList.remove('es-open'); }
 function startEdit(id){editingId=id;renderManage();}
 function cancelEdit(){editingId=null;renderManage();}
 function saveEdit(id){
@@ -754,7 +798,12 @@ function importCSV(input){
       if(!cells.length)continue;
       imported.push({id:baseId++,general:cells[colMap['一般名称']]||'',generic:colMap['後発/ジェネリック']!=null?(cells[colMap['後発/ジェネリック']]||''):'',brand:colMap['先発']!=null?(cells[colMap['先発']]||''):'',shelf:colMap['棚の種類']!=null?(cells[colMap['棚の種類']]||''):'',note:colMap['Note']!=null?(cells[colMap['Note']]||''):''});
     }
-    if(!confirm(imported.length+'件をインポートします。OK=上書き / キャンセル=追加')){var _now=Date.now();imported.forEach(function(m){m.addedAt=_now;});medicines=medicines.concat(imported);}else{medicines=imported;}
+    var ans=prompt(imported.length+'件を取り込みます。\n\n・そのまま OK：今のデータに「追加」します\n・今のデータを全部置き換えるときだけ「上書き」と入力して OK（今のデータは消えます。直前に控えをこの端末に保存します）\n・キャンセル：取り込みをやめます','');
+    if(ans===null){toast('取り込みをやめました');input.value='';return;}
+    ans=String(ans).trim();
+    if(ans===''){var _now=Date.now();imported.forEach(function(m){m.addedAt=_now;});medicines=medicines.concat(imported);}
+    else if(ans==='上書き'){if(!downloadBackup('上書きの前')){toast('⚠️ 控えを保存できなかったため、上書きをやめました');input.value='';return;}medicines=imported;}
+    else{toast('「上書き」と入力されなかったため、取り込みをやめました');input.value='';return;}
     saveMeds();buildShelfTabs();doSearch();renderManage();
     toast(imported.length+'件をインポートしました');
     input.value='';
@@ -779,12 +828,27 @@ function exportCurrentCSV(){
   document.body.appendChild(a);a.click();document.body.removeChild(a);
   toast('CSVを出力しました');
 }
+// 置き換える前の控え（2026-11-21）：今のデータを全部の項目のまま JSON でこの端末に保存する。成功で true
+function downloadBackup(why){
+  try{
+    var d=new Date(),z=function(n){return ('0'+n).slice(-2);};
+    var stamp=d.getFullYear()+z(d.getMonth()+1)+z(d.getDate())+'-'+z(d.getHours())+z(d.getMinutes());
+    var body=JSON.stringify({app:'medicine-shelf',why:why,savedAt:d.toISOString(),count:medicines.length,list:medicines});
+    var blob=new Blob([body],{type:'application/json'});
+    var a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='医薬品データ_控え_'+stamp+'.json';
+    document.body.appendChild(a);a.click();document.body.removeChild(a);
+    setTimeout(function(){URL.revokeObjectURL(a.href);},10000);
+    toast('今のデータ（'+medicines.length+'件）の控えを保存しました');
+    return true;
+  }catch(e){return false;}
+}
 async function resetToDefault(){
   var pw=prompt('初期化するにはパスワードを入力してください：');
   if(pw===null)return;
   var r=window._fbCheckPw?await window._fbCheckPw((pw||'').trim()):'error';
   if(r!=='ok'){toast(r==='wrong'?'⚠️ パスワードが違います':r==='locked'?'⚠️ 失敗が続いたため、しばらく入力できません':'⚠️ パスワードを確認できませんでした');return;}
   if(!confirm('初期データ（1065件）に戻します。現在のデータはすべて失われます。本当によろしいですか？'))return;
+  if(!downloadBackup('初期化の前')){toast('⚠️ 控えを保存できなかったため、初期化をやめました');return;}
   medicines=JSON.parse(JSON.stringify(INITIAL_DATA));
   saveMeds();buildShelfTabs();doSearch();renderManage();
   toast('初期データに戻しました');
