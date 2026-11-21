@@ -199,6 +199,7 @@ body.lbl-open{overflow:hidden;}
 .lbl-search input[type=search]{width:100%;padding:10px 12px;border:2px solid #cbd5e1;border-radius:8px;font-size:16px;outline:none;margin:6px 0;}
 .lbl-cand{display:flex;gap:8px;align-items:center;padding:6px 0;border-bottom:1px dashed #e2e8f0;}
 .lbl-cand label{flex:1;display:flex;gap:8px;align-items:flex-start;min-width:0;word-break:break-all;}
+.lbl-cand-brand{background:#f0f9ff;}
 .lbl-cand .lbl-edit,.lbl-row .lbl-edit{padding:6px 10px;border:1px solid #bae6fd;background:#e0f2fe;color:#0077b6;border-radius:6px;cursor:pointer;white-space:nowrap;font-size:13px;}
 .lbl-empty{padding:14px;color:#64748b;font-size:13px;}
 /* 印刷の面（元の HTML と同じ寸法・文字の大きさ） */
@@ -874,10 +875,12 @@ function _labelMed(id){ for(var i=0;i<medicines.length;i++){ if(medicines[i].id=
 function defaultKubun(m){ var sh = _blankish(m && m.shelf); return /毒/.test(sh) ? '毒薬' : /劇/.test(sh) ? '劇薬' : ''; }
 // 型の初期値：後発品名がなく先発品名だけなら先発の型、それ以外は後発の型。
 function defaultLabelType(m){ return (!_blankish(m.generic) && _blankish(m.brand)) ? 'brand' : 'gen'; }
-function addLabelItem(m){
+// fromBrand：検索の「先発名でシール」の行から足したもの（同じ登録から、ふつうの行とは別に1枚足せる）
+function _hasLabel(id, fromBrand){ return labelItems.some(function(x){ return x.id===id && !!x.fromBrand===!!fromBrand; }); }
+function addLabelItem(m, fromBrand){
   if (!m) return;
-  if (labelItems.some(function(x){ return x.id===m.id; })) return;
-  labelItems.push({ id:m.id, type:defaultLabelType(m), kubun:defaultKubun(m) });
+  if (_hasLabel(m.id, fromBrand)) return;
+  labelItems.push({ id:m.id, type:fromBrand ? 'brand' : defaultLabelType(m), kubun:defaultKubun(m), fromBrand:!!fromBrand });
 }
 function openLabels(){
   labelItems = labelItems.filter(function(x){ return medicines.some(function(m){ return m.id===x.id; }); });
@@ -903,7 +906,7 @@ function renderLabelRows(){
     var m = _labelMed(it.id);
     var row = _el('div','lbl-row');
     var name = _el('div','lbl-name');
-    name.appendChild(document.createTextNode((idx+1)+'. '+(_blankish(m&&m.generic)||_blankish(m&&m.brand)||(m&&m.general)||'（見つかりません）')));
+    name.appendChild(document.createTextNode((idx+1)+'. '+((it.type==='brand' && _blankish(m&&m.brand)) ? _blankish(m.brand)+'（先発の型）' : '')+((it.type==='brand' && _blankish(m&&m.brand)) ? '' : (_blankish(m&&m.generic)||_blankish(m&&m.brand)||(m&&m.general)||'（見つかりません）'))));
     name.appendChild(_el('small', null, '一般：'+((m&&m.general)||'')+'／先発：'+(_blankish(m&&m.brand)||'なし')+'／棚：'+((m&&m.shelf)||'')));
     row.appendChild(name);
     var sel = document.createElement('select');
@@ -967,7 +970,7 @@ function renderLabelRecent(){
   rec.forEach(function(m){
     var lab = document.createElement('label');
     var cb = document.createElement('input'); cb.type='checkbox'; cb.value=String(m.id);
-    if (labelItems.some(function(x){ return x.id===m.id; })) { cb.checked=true; cb.disabled=true; }
+    if (_hasLabel(m.id, false)) { cb.checked=true; cb.disabled=true; }
     lab.appendChild(cb);
     var dt = new Date(m.addedAt);
     lab.appendChild(_el('span', null, (dt.getMonth()+1)+'/'+dt.getDate()+'　'+(_blankish(m.generic)||_blankish(m.brand)||m.general||'')+'（棚：'+(m.shelf||'')+'）'));
@@ -993,11 +996,29 @@ function renderLabelSearch(){
   var q = norm(raw);
   var hit = medicines.filter(function(m){ return [m.general, m.generic, m.brand, m.shelf].some(function(v){ return norm(v).indexOf(q) >= 0; }); });
   if (!hit.length) { list.appendChild(_el('div','lbl-empty','見つかりませんでした。')); return; }
+  // 先発の欄で当たったとき：先発名ごとに「〇〇（先発名でシール）」の行を1つ出す（登録は書き換えない）。
+  // その先発品そのものが登録されている（後発品名がなく先発品名だけの行がある）ときは、ふつうの行で足りるので出さない。
+  var bseen = {}, brows = [];
+  medicines.forEach(function(m){ var b = _blankish(m.brand); if (b && defaultLabelType(m)==='brand') bseen[norm(b)] = true; });
+  hit.forEach(function(m){
+    var b = _blankish(m.brand); if (!b || norm(b).indexOf(q) < 0) return;
+    var k = norm(b); if (bseen[k]) return; bseen[k] = true; brows.push(m);
+  });
+  brows.slice(0, 10).forEach(function(m){
+    var row = _el('div','lbl-cand lbl-cand-brand');
+    var lab = document.createElement('label');
+    var cb = document.createElement('input'); cb.type='checkbox'; cb.value='b:'+m.id;
+    if (_hasLabel(m.id, true)) { cb.checked=true; cb.disabled=true; }
+    lab.appendChild(cb);
+    var tx = _el('span', null, _blankish(m.brand)+'（先発名でシール）');
+    tx.appendChild(_el('small', null, '　先発の型で足します。一般：'+(m.general||'')+'／下の段：後発 '+(_blankish(m.generic)||'なし')));
+    lab.appendChild(tx); row.appendChild(lab); list.appendChild(row);
+  });
   hit.slice(0, LBL_SEARCH_MAX).forEach(function(m){
     var row = _el('div','lbl-cand');
     var lab = document.createElement('label');
     var cb = document.createElement('input'); cb.type='checkbox'; cb.value=String(m.id);
-    if (labelItems.some(function(x){ return x.id===m.id; })) { cb.checked=true; cb.disabled=true; }
+    if (_hasLabel(m.id, false)) { cb.checked=true; cb.disabled=true; }
     lab.appendChild(cb);
     var tx = _el('span', null, (_blankish(m.generic)||_blankish(m.brand)||m.general||''));
     tx.appendChild(_el('small', null, '　一般：'+(m.general||'')+'／先発：'+(_blankish(m.brand)||'なし')+'／棚：'+(m.shelf||'')));
@@ -1010,7 +1031,8 @@ function renderLabelSearch(){
 function addCheckedSearch(){
   var n = 0;
   document.querySelectorAll('#lbl-search-list input[type=checkbox]:checked:not(:disabled)').forEach(function(cb){
-    var m = _labelMed(Number(cb.value)); if (m) { addLabelItem(m); n++; }
+    var v = String(cb.value), fb = v.indexOf('b:')===0;
+    var m = _labelMed(Number(fb ? v.slice(2) : v)); if (m) { addLabelItem(m, fb); n++; }
   });
   if (!n) { toast('⚠️ 薬にチェックを付けてください'); return; }
   renderLabelSearch(); renderLabelRecent(); renderLabelRows(); renderLabelSheet();
