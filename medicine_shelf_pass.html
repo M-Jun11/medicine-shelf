@@ -891,10 +891,27 @@ function openLabels(){
   renderLabelRecent(); renderLabelSearch(); renderLabelRows(); renderLabelSheet();
 }
 function closeLabels(){ document.body.classList.remove('lbl-open'); }
+// 印刷（2026-11-21 直し）：チェックだけ付けて「足す」を押していない薬は、ここで足してから印刷する。
+// iPhone のホーム画面から開いたときなど、印刷の画面が開かないことがある → 開いたかを beforeprint で確かめ、開かなければ理由と別の方法を出す。
+var _lblPrintOpened = false;
+window.addEventListener('beforeprint', function(){ _lblPrintOpened = true; });
+function _lblStandalone(){ try { return window.navigator.standalone === true || (window.matchMedia && window.matchMedia('(display-mode: standalone)').matches); } catch(e) { return false; } }
 function printLabels(){
-  if (!labelItems.length) { toast('⚠️ シールにする薬がありません'); return; }
+  var n = 0;
+  document.querySelectorAll('#lbl-search-list input[type=checkbox]:checked:not(:disabled), #lbl-recent-list input[type=checkbox]:checked:not(:disabled)').forEach(function(cb){
+    var v = String(cb.value), fb = v.indexOf('b:')===0;
+    var m = _labelMed(Number(fb ? v.slice(2) : v)); if (m && !_hasLabel(m.id, fb)) { addLabelItem(m, fb); n++; }
+  });
+  if (n) { renderLabelSearch(); renderLabelRecent(); renderLabelRows(); }
+  if (!labelItems.length) { alert('シールにする薬がありません。\n「薬を探す」か「最近足した薬から選ぶ」で薬にチェックを付けてから、もう一度「印刷する」を押してください。'); return; }
   renderLabelSheet();
-  window.print();
+  if (_lblStandalone()) { alert('ホーム画面から開いたアプリでは、印刷の画面が開かないことがあります。\n開かないときは、Safari でこのページを開いて「印刷する」を押すか、PC で印刷してください。'); }
+  _lblPrintOpened = false;
+  try { window.print(); } catch(e) {}
+  setTimeout(function(){
+    if (_lblPrintOpened) return;
+    toast('印刷の画面が開かないときは、Safari の共有ボタン →「プリント」か、PC で印刷してください');
+  }, 1500);
 }
 function setAllLabelType(t){ labelItems.forEach(function(x){ x.type=t; }); renderLabelRows(); renderLabelSheet(); }
 function _el(tag, cls, text){ var e=document.createElement(tag); if(cls) e.className=cls; if(text!=null) e.textContent=text; return e; }
